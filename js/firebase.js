@@ -9,12 +9,13 @@
 // Firebase 設定（ここを本番値に変更）
 // =============================================
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey: "AIzaSyAp572rzJeUQ2x4yVFqYYHmXA8_9jnYfrI",
+  authDomain: "sensei-app-b4501.firebaseapp.com",
+  projectId: "sensei-app-b4501",
+  storageBucket: "sensei-app-b4501.firebasestorage.app",
+  messagingSenderId: "424628963913",
+  appId: "1:424628963913:web:189d91f4de59e03f834d98",
+  measurementId: "G-Q8WCQTSE6B"
 };
 
 // =============================================
