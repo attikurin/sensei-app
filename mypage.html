@@ -147,6 +147,44 @@
       display: flex; align-items: center; gap: 8px;
     }
 
+    /* プロフィール編集ボタン */
+    .profile-edit-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 12px; padding: 7px 16px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--border);
+      background: var(--surface); color: var(--text-sub);
+      font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; transition: all var(--transition);
+      width: 100%; justify-content: center;
+    }
+    .profile-edit-btn:hover { border-color: var(--moss); color: var(--moss); background: #E8F0E4; }
+
+    /* 絵文字アイコン選択グリッド */
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px; margin: 12px 0;
+    }
+    .emoji-option {
+      font-size: 1.6rem; width: 100%; aspect-ratio: 1;
+      border: 2px solid var(--border); border-radius: var(--radius-md);
+      background: var(--bg); cursor: pointer;
+      transition: all var(--transition);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .emoji-option:hover { border-color: var(--moss); background: #E8F0E4; transform: scale(1.08); }
+    .emoji-option.selected { border-color: var(--moss); background: #E8F0E4; box-shadow: 0 0 0 3px rgba(74,103,65,0.2); }
+
+    /* アイコンプレビュー */
+    .icon-preview {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--moss-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; margin: 0 auto 6px;
+      border: 3px solid var(--border);
+    }
+
     @media (max-width: 860px) {
       .mypage-layout { grid-template-columns: 1fr; }
       .profile-card { position: static; }
@@ -233,6 +271,10 @@
           <div class="profile-avatar" id="profile-avatar">先</div>
           <p class="profile-name" id="profile-name">---</p>
           <p class="profile-email" id="profile-email">---</p>
+
+          <button class="profile-edit-btn" id="open-profile-edit-btn" aria-label="プロフィールを編集">
+            <i class="fa fa-pen" aria-hidden="true"></i> ニックネーム・アイコンを編集
+          </button>
 
           <div class="profile-stats">
             <div class="profile-stat">
@@ -328,6 +370,44 @@
 
 <div id="toast-container" aria-live="polite"></div>
 
+<!-- プロフィール編集モーダル -->
+<div class="modal-overlay" id="profile-edit-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+  <div class="modal" style="max-width:520px;">
+    <button class="modal__close" onclick="document.getElementById('profile-edit-modal').classList.remove('open')" aria-label="閉じる">✕</button>
+    <h3 id="profile-modal-title" style="margin-bottom:20px;">👤 プロフィールを編集</h3>
+
+    <!-- アイコンプレビュー -->
+    <div style="text-align:center;margin-bottom:16px;">
+      <div class="icon-preview" id="icon-preview">🍀</div>
+      <p style="font-size:0.8rem;color:var(--text-sub);">選択中のアイコン</p>
+    </div>
+
+    <!-- 絵文字選択 -->
+    <div class="form-group">
+      <label class="form-label">アイコン絵文字を選ぶ</label>
+      <div class="emoji-grid" id="emoji-grid" role="radiogroup" aria-label="アイコン絵文字"></div>
+    </div>
+
+    <!-- ニックネーム -->
+    <div class="form-group">
+      <label class="form-label" for="edit-nickname">
+        ニックネーム <span class="required">*必須</span>
+      </label>
+      <input type="text" id="edit-nickname" class="form-input"
+             placeholder="例：山田先生、理科部顧問" maxlength="20">
+      <p class="form-hint">20文字以内。アプリの投稿者名として表示されます。</p>
+      <p class="form-error hidden" id="nickname-error">ニックネームを入力してください</p>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:8px;">
+      <button id="save-profile-btn" class="btn btn--primary btn--full">
+        <i class="fa fa-check"></i> 保存する
+      </button>
+      <button onclick="document.getElementById('profile-edit-modal').classList.remove('open')" class="btn btn--ghost btn--full">キャンセル</button>
+    </div>
+  </div>
+</div>
+
 <!-- 削除確認モーダル -->
 <div class="modal-overlay" id="delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
   <div class="modal">
@@ -345,7 +425,7 @@
 <script type="module">
   import {
     auth, loginWithGoogle, logout, getMyApps, deleteApp, updateApp,
-    onAuthStateChanged, getUserDoc
+    onAuthStateChanged, getUserDoc, updateUserProfile
   } from "./js/firebase.js";
 
   function escHtml(s) {
@@ -372,7 +452,17 @@
   }
 
   let deleteTargetId = null;
-  let myApps = [];
+  let myApps         = [];
+  let currentUser    = null;
+  let selectedEmoji  = "🍀";
+
+  const EMOJI_LIST = [
+    "🍀","👩‍🏫","👨‍🏫","🏫","📚","✏️",
+    "🎓","🌸","🌟","🎯","💡","🔬",
+    "🎨","🎵","⚽","🍎","🌈","🦋",
+    "🐶","🐱","🐸","🐼","🦊","🐧",
+    "🌻","🍀","🌿","🍁","☀️","🌙"
+  ];
 
   // ========== 認証 ==========
   onAuthStateChanged(auth, async (user) => {
@@ -381,19 +471,30 @@
       document.getElementById("login-required").classList.remove("hidden");
       return;
     }
+    currentUser = user;
     document.getElementById("mypage-main").classList.remove("hidden");
-    renderProfile(user);
+    const userDoc = await getUserDoc(user.uid);
+    renderProfile(user, userDoc);
     await loadMyApps(user.uid);
   });
 
-  function renderProfile(user) {
-    const avEl = document.getElementById("profile-avatar");
-    if (user.photoURL) {
-      avEl.innerHTML = `<img src="${user.photoURL}" alt="${escHtml(user.displayName||'')}">`;
+  function renderProfile(user, userDoc = null) {
+    const avEl      = document.getElementById("profile-avatar");
+    const nickname  = userDoc?.displayName || user.displayName || "先生";
+    const iconEmoji = userDoc?.iconEmoji || "";
+
+    // アイコン表示：絵文字 > Google写真 > イニシャルの優先順
+    if (iconEmoji) {
+      avEl.style.fontSize = "2.2rem";
+      avEl.style.background = "var(--moss-light)";
+      avEl.innerHTML = iconEmoji;
+    } else if (user.photoURL) {
+      avEl.innerHTML = `<img src="${user.photoURL}" alt="${escHtml(nickname)}">`;
     } else {
-      avEl.textContent = (user.displayName||"先")[0];
+      avEl.style.fontSize = "2rem";
+      avEl.textContent = nickname[0];
     }
-    document.getElementById("profile-name").textContent  = user.displayName || "先生";
+    document.getElementById("profile-name").textContent  = nickname;
     document.getElementById("profile-email").textContent = user.email || "";
   }
 
@@ -572,6 +673,76 @@
 
   document.getElementById("hamburger-btn")?.addEventListener("click", () => {
     document.getElementById("mobile-menu").classList.toggle("open");
+  });
+
+  // ========== プロフィール編集 ==========
+  function buildEmojiGrid(currentEmoji) {
+    const grid = document.getElementById("emoji-grid");
+    grid.innerHTML = EMOJI_LIST.map(em => `
+      <button type="button"
+              class="emoji-option${em === currentEmoji ? ' selected' : ''}"
+              data-emoji="${em}" aria-label="${em}"
+              aria-pressed="${em === currentEmoji}">${em}</button>
+    `).join("");
+    grid.querySelectorAll(".emoji-option").forEach(btn => {
+      btn.addEventListener("click", () => {
+        grid.querySelectorAll(".emoji-option").forEach(b => {
+          b.classList.remove("selected");
+          b.setAttribute("aria-pressed", "false");
+        });
+        btn.classList.add("selected");
+        btn.setAttribute("aria-pressed", "true");
+        selectedEmoji = btn.dataset.emoji;
+        document.getElementById("icon-preview").textContent = selectedEmoji;
+      });
+    });
+  }
+
+  // 編集ボタンを押したときモーダルを開く
+  document.getElementById("open-profile-edit-btn").addEventListener("click", async () => {
+    if (!currentUser) return;
+    const userDoc   = await getUserDoc(currentUser.uid);
+    const nickname  = userDoc?.displayName || currentUser.displayName || "先生";
+    const iconEmoji = userDoc?.iconEmoji   || "🍀";
+    selectedEmoji   = iconEmoji;
+    document.getElementById("edit-nickname").value       = nickname;
+    document.getElementById("icon-preview").textContent  = iconEmoji;
+    document.getElementById("nickname-error").classList.add("hidden");
+    buildEmojiGrid(iconEmoji);
+    document.getElementById("profile-edit-modal").classList.add("open");
+  });
+
+  // 保存
+  document.getElementById("save-profile-btn").addEventListener("click", async () => {
+    const nickname = document.getElementById("edit-nickname").value.trim();
+    if (!nickname) {
+      document.getElementById("nickname-error").classList.remove("hidden");
+      return;
+    }
+    document.getElementById("nickname-error").classList.add("hidden");
+    const btn = document.getElementById("save-profile-btn");
+    btn.disabled = true;
+    btn.innerHTML = `<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;"></span> 保存中...`;
+    try {
+      await updateUserProfile(currentUser.uid, { displayName: nickname, iconEmoji: selectedEmoji });
+      const userDoc = await getUserDoc(currentUser.uid);
+      renderProfile(currentUser, userDoc);
+      document.getElementById("profile-edit-modal").classList.remove("open");
+      showToast("プロフィールを更新しました！", "success");
+    } catch (e) {
+      console.error(e);
+      showToast("保存に失敗しました", "error");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa fa-check"></i> 保存する`;
+    }
+  });
+
+  // モーダル外クリックで閉じる
+  document.getElementById("profile-edit-modal").addEventListener("click", e => {
+    if (e.target === document.getElementById("profile-edit-modal")) {
+      document.getElementById("profile-edit-modal").classList.remove("open");
+    }
   });
 </script>
 </body>

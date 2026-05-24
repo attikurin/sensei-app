@@ -9,13 +9,13 @@
 // Firebase 設定（ここを本番値に変更）
 // =============================================
 const firebaseConfig = {
-  apiKey: "AIzaSyAp572rzJeUQ2x4yVFqYYHmXA8_9jnYfrI",
-  authDomain: "sensei-app-b4501.firebaseapp.com",
-  projectId: "sensei-app-b4501",
-  storageBucket: "sensei-app-b4501.firebasestorage.app",
+  apiKey:            "AIzaSyAp572rzJeUQ2x4yVFqYYHmXA8_9jnYfrI",
+  authDomain:        "sensei-app-b4501.firebaseapp.com",
+  projectId:         "sensei-app-b4501",
+  storageBucket:     "sensei-app-b4501.firebasestorage.app",
   messagingSenderId: "424628963913",
-  appId: "1:424628963913:web:189d91f4de59e03f834d98",
-  measurementId: "G-Q8WCQTSE6B"
+  appId:             "1:424628963913:web:189d91f4de59e03f834d98",
+  measurementId:     "G-Q8WCQTSE6B"
 };
 
 // =============================================
@@ -84,6 +84,19 @@ async function ensureUserDoc(user) {
 async function getUserDoc(uid) {
   const snap = await getDoc(doc(db, "users", uid));
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+/**
+ * プロフィール（ニックネーム・アイコン絵文字）を更新する
+ * @param {string} uid
+ * @param {object} profile - { displayName, iconEmoji }
+ */
+async function updateUserProfile(uid, profile) {
+  await updateDoc(doc(db, "users", uid), {
+    displayName: profile.displayName,
+    iconEmoji:   profile.iconEmoji || null,
+    updatedAt:   serverTimestamp()
+  });
 }
 
 /** 現在のユーザーが admin かどうか */
@@ -321,7 +334,7 @@ async function setPickup(appId, pickup, pickupOrder = 999) {
 window.FB = {
   auth, db, storage,
   loginWithGoogle, logout,
-  getUserDoc, isAdmin,
+  getUserDoc, isAdmin, updateUserProfile,
   getApps, getPickupApps, getApp, getMyApps,
   submitApp, updateApp, deleteApp,
   incrementView, toggleLike, hasLiked,
@@ -334,7 +347,7 @@ window.FB = {
 export {
   auth, db, storage,
   loginWithGoogle, logout,
-  getUserDoc, isAdmin,
+  getUserDoc, isAdmin, updateUserProfile,
   getApps, getPickupApps, getApp, getMyApps,
   submitApp, updateApp, deleteApp,
   incrementView, toggleLike, hasLiked,
