@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理者ダッシュボード - 先生アプリ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ===== 管理者ダッシュボード専用スタイル ===== */
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 28px;
+      padding: 36px 0 80px;
+      align-items: start;
+    }
+
+    /* サイドナビ */
+    .admin-sidenav {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 16px;
+      position: sticky;
+      top: 80px;
+    }
+    .admin-sidenav__title {
+      font-size: 0.75rem; font-weight: 700;
+      color: var(--text-light); text-transform: uppercase;
+      letter-spacing: 0.08em; padding: 0 8px; margin-bottom: 8px;
+    }
+    .admin-sidenav a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: var(--radius-md);
+      font-size: 0.88rem; font-weight: 500; color: var(--text-sub);
+      text-decoration: none; transition: all var(--transition);
+    }
+    .admin-sidenav a:hover, .admin-sidenav a.active {
+      background: var(--surface-2); color: var(--moss);
+    }
+    .admin-sidenav a.active { font-weight: 700; }
+
+    /* サマリーカード */
+    .summary-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 16px; margin-bottom: 28px;
+    }
+    .summary-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 16px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .summary-card__icon {
+      width: 44px; height: 44px; border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .summary-card__icon--moss    { background: #DCE8D8; }
+    .summary-card__icon--mustard { background: #FBF0CE; }
+    .summary-card__icon--salmon  { background: #FDDDD6; }
+    .summary-card__icon--blue    { background: #E8F0FE; }
+    .summary-card__num { font-size: 1.6rem; font-weight: 700; color: var(--moss-dark); line-height: 1; }
+    .summary-card__label { font-size: 0.78rem; color: var(--text-sub); margin-top: 2px; }
+
+    /* コンテンツカード */
+    .admin-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .admin-card__header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1.5px solid var(--border);
+      background: var(--bg);
+    }
+    .admin-card__title {
+      font-size: 0.97rem; font-weight: 700; color: var(--moss-dark);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .admin-card__body { padding: 20px; }
+
+    /* テーブル */
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .admin-table th {
+      text-align: left; padding: 8px 12px;
+      font-size: 0.78rem; font-weight: 700; color: var(--text-sub);
+      border-bottom: 2px solid var(--border);
+      background: var(--bg); white-space: nowrap;
+    }
+    .admin-table td {
+      padding: 12px; border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr:hover td { background: var(--bg); }
+    .admin-table .app-mini {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .admin-table .app-mini__thumb {
+      width: 40px; height: 40px; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg,#E8F0E4,#D1E0CB);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0; overflow: hidden;
+    }
+    .admin-table .app-mini__thumb img { width:100%;height:100%;object-fit:cover; }
+
+    /* アクションボタン */
+    .admin-action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .admin-btn {
+      padding: 4px 10px; border-radius: var(--radius-sm);
+      font-size: 0.76rem; font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: var(--surface); color: var(--text-sub);
+      cursor: pointer; transition: all var(--transition);
+      display: inline-flex; align-items: center; gap: 4px;
+      white-space: nowrap;
+    }
+    .admin-btn--danger:hover  { background: #FDDDD6; border-color: var(--salmon); color: var(--salmon); }
+    .admin-btn--pickup:hover  { background: #FBF0CE; border-color: var(--mustard); color: #8A6E00; }
+    .admin-btn--restore:hover { background: #DCFCE7; border-color: #16A34A; color: #166534; }
+    .admin-btn--ban:hover     { background: #FEE2E2; border-color: #DC2626; color: #991B1B; }
+    .admin-btn--unban:hover   { background: #DCFCE7; border-color: #16A34A; color: #166534; }
+
+    /* お知らせフォーム */
+    .notice-form {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .notice-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; background: var(--bg);
+      border-radius: var(--radius-md); border: 1px solid var(--border);
+    }
+    .notice-row__body { flex: 1; font-size: 0.88rem; }
+    .notice-row__date { font-size: 0.78rem; color: var(--text-light); white-space: nowrap; }
+
+    /* タブ */
+    .admin-tabs {
+      display: flex; gap: 4px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .admin-tab {
+      padding: 8px 18px; border: none; background: none;
+      font-size: 0.9rem; font-weight: 600; color: var(--text-sub);
+      cursor: pointer; transition: all var(--transition);
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+    }
+    .admin-tab.active {
+      color: var(--moss); border-bottom-color: var(--moss);
+    }
+    .admin-tab-panel { display: none; }
+    .admin-tab-panel.active { display: block; }
+
+    /* ピックアップ設定 */
+    .pickup-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px; background: var(--bg);
+      border-radius: var(--radius-md); border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .pickup-order-input {
+      width: 50px; text-align: center;
+      padding: 4px 8px; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 0.88rem;
+    }
+
+    @media (max-width: 900px) {
+      .admin-layout { grid-template-columns: 1fr; }
+      .admin-sidenav { position: static; }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 500px) {
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<a href="#admin-main" class="skip-link">メインコンテンツへスキップ</a>
+
+<!-- ヘッダー -->
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="site-logo">
+      <div class="site-logo__icon">🍀</div>
+      <div class="site-logo__text">先生<span>アプリ</span></div>
+    </a>
+    <div class="header-actions">
+      <span style="font-size:0.82rem;color:var(--text-sub);" id="admin-user-label">管理者</span>
+      <button id="logout-btn" class="btn btn--ghost btn--sm">
+        <i class="fa fa-right-from-bracket"></i> ログアウト
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- 権限エラー表示 -->
+<div id="access-denied" class="hidden" style="text-align:center;padding:80px 20px;">
+  <div class="container">
+    <div style="font-size:3rem;margin-bottom:16px;">🚫</div>
+    <h2>アクセス権限がありません</h2>
+    <p class="text-sub" style="margin:8px 0 24px;">このページは管理者のみアクセスできます。</p>
+    <a href="/" class="btn btn--primary">トップページへ</a>
+  </div>
+</div>
+
+<!-- ローディング -->
+<div id="admin-loading" style="text-align:center;padding:80px 20px;">
+  <div class="loading-spinner" style="width:40px;height:40px;margin:0 auto 16px;"></div>
+  <p class="text-sub">認証確認中...</p>
+</div>
+
+<!-- 管理者コンテンツ -->
+<main id="admin-main" class="hidden">
+  <div class="container container--wide">
+    <div class="admin-layout">
+
+      <!-- ===== サイドナビ ===== -->
+      <nav class="admin-sidenav" aria-label="管理メニュー">
+        <p class="admin-sidenav__title">管理メニュー</p>
+        <a href="#" class="active" data-tab-target="tab-apps" onclick="switchTab(event,'tab-apps')">
+          <i class="fa fa-grid-2"></i> アプリ管理
+        </a>
+        <a href="#" data-tab-target="tab-users" onclick="switchTab(event,'tab-users')">
+          <i class="fa fa-users"></i> ユーザー管理
+        </a>
+        <a href="#" data-tab-target="tab-pickup" onclick="switchTab(event,'tab-pickup')">
+          <i class="fa fa-star"></i> ピックアップ管理
+        </a>
+        <a href="#" data-tab-target="tab-notices" onclick="switchTab(event,'tab-notices')">
+          <i class="fa fa-bell"></i> お知らせ管理
+        </a>
+        <hr style="margin:10px 0;border-color:var(--border);">
+        <a href="/" style="color:var(--salmon);">
+          <i class="fa fa-arrow-left"></i> サイトに戻る
+        </a>
+      </nav>
+
+      <!-- ===== メインエリア ===== -->
+      <div>
+
+        <!-- サマリー -->
+        <div class="summary-grid" role="region" aria-label="サイト統計">
+          <div class="summary-card">
+            <div class="summary-card__icon summary-card__icon--moss" aria-hidden="true">📱</div>
+            <div>
+              <div class="summary-card__num" id="stat-total-apps">--</div>
+              <div class="summary-card__label">総アプリ数</div>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card__icon summary-card__icon--mustard" aria-hidden="true">👩‍🏫</div>
+            <div>
+              <div class="summary-card__num" id="stat-total-users">--</div>
+              <div class="summary-card__label">登録ユーザー数</div>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card__icon summary-card__icon--salmon" aria-hidden="true">❤️</div>
+            <div>
+              <div class="summary-card__num" id="stat-total-likes">--</div>
+              <div class="summary-card__label">総いいね数</div>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card__icon summary-card__icon--blue" aria-hidden="true">⭐</div>
+            <div>
+              <div class="summary-card__num" id="stat-pickup-count">--</div>
+              <div class="summary-card__label">ピックアップ中</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== タブ：アプリ管理 ===== -->
+        <div id="tab-apps" class="admin-tab-panel active">
+          <div class="admin-card">
+            <div class="admin-card__header">
+              <h2 class="admin-card__title"><i class="fa fa-grid-2"></i> アプリ管理</h2>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="search" id="app-search" class="form-input" placeholder="検索..."
+                       style="width:200px;padding:6px 12px;" aria-label="アプリを検索">
+                <select id="app-filter" class="form-select" style="width:120px;padding:6px 12px;" aria-label="ステータスフィルター">
+                  <option value="all">すべて</option>
+                  <option value="public">公開中</option>
+                  <option value="private">非公開</option>
+                  <option value="deleted">削除済</option>
+                </select>
+              </div>
+            </div>
+            <div class="admin-card__body" style="padding:0;overflow-x:auto;">
+              <div id="apps-loading" style="text-align:center;padding:40px;">
+                <div class="loading-spinner" style="margin:0 auto;"></div>
+              </div>
+              <table class="admin-table" id="apps-table" style="display:none;" aria-label="アプリ一覧">
+                <thead>
+                  <tr>
+                    <th>アプリ</th>
+                    <th>投稿者</th>
+                    <th>状態</th>
+                    <th>いいね</th>
+                    <th>ピックアップ</th>
+                    <th>投稿日</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="apps-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== タブ：ユーザー管理 ===== -->
+        <div id="tab-users" class="admin-tab-panel">
+          <div class="admin-card">
+            <div class="admin-card__header">
+              <h2 class="admin-card__title"><i class="fa fa-users"></i> ユーザー管理</h2>
+            </div>
+            <div class="admin-card__body" style="padding:0;overflow-x:auto;">
+              <div id="users-loading" style="text-align:center;padding:40px;">
+                <div class="loading-spinner" style="margin:0 auto;"></div>
+              </div>
+              <table class="admin-table" id="users-table" style="display:none;" aria-label="ユーザー一覧">
+                <thead>
+                  <tr>
+                    <th>ユーザー</th>
+                    <th>メール</th>
+                    <th>役割</th>
+                    <th>状態</th>
+                    <th>登録日</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="users-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== タブ：ピックアップ管理 ===== -->
+        <div id="tab-pickup" class="admin-tab-panel">
+          <div class="admin-card">
+            <div class="admin-card__header">
+              <h2 class="admin-card__title"><i class="fa fa-star"></i> ピックアップ管理</h2>
+              <span class="badge badge--mustard">トップページに表示</span>
+            </div>
+            <div class="admin-card__body">
+              <div class="alert alert--info" style="margin-bottom:16px;">
+                <i class="fa fa-circle-info"></i>
+                <div>ピックアップに設定したアプリはトップページの「今週のピックアップ」に表示されます。表示順は数字が小さいほど上に表示されます。</div>
+              </div>
+              <div id="pickup-list">
+                <div class="loading-spinner" style="margin:0 auto;display:block;width:28px;height:28px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== タブ：お知らせ管理 ===== -->
+        <div id="tab-notices" class="admin-tab-panel">
+          <div class="admin-card">
+            <div class="admin-card__header">
+              <h2 class="admin-card__title"><i class="fa fa-bell"></i> お知らせ管理</h2>
+            </div>
+            <div class="admin-card__body">
+              <p style="font-size:0.88rem;color:var(--text-sub);margin-bottom:16px;">
+                トップページに表示するお知らせ（最大3件）を管理します。
+              </p>
+
+              <!-- 新規追加フォーム -->
+              <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:20px;">
+                <h3 style="font-size:0.92rem;font-weight:700;color:var(--moss-dark);margin-bottom:12px;">
+                  ＋ 新しいお知らせを追加
+                </h3>
+                <div class="form-group" style="margin-bottom:12px;">
+                  <label class="form-label" for="notice-input">お知らせ本文</label>
+                  <input type="text" id="notice-input" class="form-input"
+                         placeholder="例：サイトメンテナンスのお知らせ（5/25 深夜1時〜）"
+                         maxlength="200" aria-label="お知らせ本文を入力">
+                </div>
+                <button id="add-notice-btn" class="btn btn--primary btn--sm">
+                  <i class="fa fa-plus"></i> 追加する
+                </button>
+              </div>
+
+              <!-- 既存お知らせ一覧 -->
+              <div id="notices-list">
+                <div class="loading-spinner" style="margin:0 auto;display:block;width:28px;height:28px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /メインエリア -->
+    </div>
+  </div>
+</main>
+
+<div id="toast-container" aria-live="polite"></div>
+
+<script type="module">
+  import {
+    auth, isAdmin, getAllAppsAdmin, getAllUsersAdmin,
+    banUser, unbanUser, forceDeleteApp, setPickup,
+    addNotice, getNotices, deleteNotice, updateApp,
+    onAuthStateChanged, getUserDoc
+  } from "./js/firebase.js";
+
+  function escHtml(s) {
+    return String(s ?? "").replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function formatDate(ts) {
+    if (!ts) return "---";
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString("ja-JP",{year:"numeric",month:"short",day:"numeric"});
+  }
+  function showToast(msg, type="default") {
+    const c = document.getElementById("toast-container");
+    const icons = {success:"✅",error:"❌",warning:"⚠️",default:"📢"};
+    const t = document.createElement("div");
+    t.className = `toast toast--${type}`;
+    t.innerHTML = `<span>${icons[type]||icons.default}</span><span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+  function getEmoji(tags=[]) {
+    const map = {"校務支援":"📋","学級経営":"🏫","授業・教材":"📚","評価・採点":"✅","保護者連絡":"📨","特別支援":"🤝","ICT活用":"💻","部活・行事":"🎉","その他":"🌟"};
+    for (const t of tags) if (map[t]) return map[t];
+    return "🍀";
+  }
+
+  let allApps  = [];
+  let allUsers = [];
+
+  // ========== 認証チェック ==========
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      document.getElementById("admin-loading").classList.add("hidden");
+      document.getElementById("access-denied").classList.remove("hidden");
+      return;
+    }
+    const adminOk = await isAdmin(user.uid);
+    document.getElementById("admin-loading").classList.add("hidden");
+    if (!adminOk) {
+      document.getElementById("access-denied").classList.remove("hidden");
+      return;
+    }
+    document.getElementById("admin-main").classList.remove("hidden");
+    document.getElementById("admin-user-label").textContent = `${user.displayName || "管理者"} (管理者)`;
+
+    await Promise.all([loadApps(), loadUsers(), loadNoticesList()]);
+  });
+
+  // ========== ログアウト ==========
+  document.getElementById("logout-btn").addEventListener("click", async () => {
+    const { logout } = await import("./js/firebase.js");
+    await logout();
+    location.href = "/";
+  });
+
+  // ========== タブ切り替え ==========
+  window.switchTab = function(e, tabId) {
+    e.preventDefault();
+    document.querySelectorAll(".admin-tab-panel").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".admin-sidenav a").forEach(a => a.classList.remove("active"));
+    document.getElementById(tabId).classList.add("active");
+    e.currentTarget.classList.add("active");
+
+    if (tabId === "tab-pickup") loadPickupList();
+  };
+
+  // ========== アプリ一覧 ==========
+  async function loadApps() {
+    try {
+      allApps = await getAllAppsAdmin();
+      document.getElementById("apps-loading").style.display = "none";
+      document.getElementById("apps-table").style.display = "";
+
+      // サマリー統計
+      document.getElementById("stat-total-apps").textContent   = allApps.filter(a => a.status !== "deleted").length;
+      document.getElementById("stat-total-likes").textContent  = allApps.reduce((s,a) => s+(a.likeCount||0), 0);
+      document.getElementById("stat-pickup-count").textContent = allApps.filter(a => a.pickup).length;
+
+      renderAppsTable(allApps);
+    } catch (e) {
+      console.error(e);
+      document.getElementById("apps-loading").innerHTML = `<p class="text-sub">読み込みに失敗しました</p>`;
+    }
+  }
+
+  function renderAppsTable(apps) {
+    const filter = document.getElementById("app-filter")?.value || "all";
+    const search = (document.getElementById("app-search")?.value || "").toLowerCase();
+    const filtered = apps.filter(a => {
+      const matchStatus = filter === "all" || a.status === filter;
+      const matchSearch = !search || a.title?.toLowerCase().includes(search) || a.authorName?.toLowerCase().includes(search);
+      return matchStatus && matchSearch;
+    });
+
+    const statusColors = { public: "status-public", private: "status-private", deleted: "status-badge badge--gray" };
+    const statusLabels = { public: "✅ 公開中", private: "🔒 非公開", deleted: "🗑️ 削除済" };
+
+    document.getElementById("apps-tbody").innerHTML = filtered.map(app => `
+      <tr>
+        <td>
+          <div class="app-mini">
+            <div class="app-mini__thumb">
+              ${app.thumbnailUrl ? `<img src="${escHtml(app.thumbnailUrl)}" alt="">` : getEmoji(app.tags||[])}
+            </div>
+            <div>
+              <a href="app-detail.html?id=${escHtml(app.id)}" target="_blank"
+                 style="font-weight:600;color:var(--moss);text-decoration:none;">${escHtml(app.title)}</a>
+              <br><span style="font-size:0.75rem;color:var(--text-light);">
+                ${(app.tags||[]).join(" / ")} • ${app.shareType === "html" ? "📦 HTML" : "🔗 リンク"}
+              </span>
+            </div>
+          </div>
+        </td>
+        <td style="font-size:0.85rem;">${escHtml(app.authorName||"---")}</td>
+        <td>
+          <span class="status-badge ${statusColors[app.status] || ''}">${statusLabels[app.status] || app.status}</span>
+        </td>
+        <td>❤️ ${app.likeCount||0}</td>
+        <td>
+          <span class="${app.pickup ? 'badge badge--mustard' : 'badge badge--gray'}">
+            ${app.pickup ? "⭐ ON" : "OFF"}
+          </span>
+        </td>
+        <td style="font-size:0.82rem;white-space:nowrap;">${formatDate(app.createdAt)}</td>
+        <td>
+          <div class="admin-action-btns">
+            ${app.status !== "public" && app.status !== "deleted"
+              ? `<button class="admin-btn admin-btn--restore" onclick="toggleAppStatus('${escHtml(app.id)}','public')"><i class="fa fa-eye"></i> 公開</button>`
+              : ""}
+            ${app.status === "public"
+              ? `<button class="admin-btn admin-btn--danger" onclick="toggleAppStatus('${escHtml(app.id)}','private')"><i class="fa fa-eye-slash"></i> 非公開</button>`
+              : ""}
+            ${app.status !== "deleted"
+              ? `<button class="admin-btn admin-btn--danger" onclick="adminDeleteApp('${escHtml(app.id)}')"><i class="fa fa-trash"></i> 削除</button>`
+              : ""}
+            <button class="admin-btn admin-btn--pickup" onclick="togglePickup('${escHtml(app.id)}',${app.pickup})">
+              ${app.pickup ? "<i class='fa fa-star-half-stroke'></i> ピックアップ解除" : "<i class='fa fa-star'></i> ピックアップ"}
+            </button>
+          </div>
+        </td>
+      </tr>`).join("") || `<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-sub);">データなし</td></tr>`;
+  }
+
+  document.getElementById("app-search")?.addEventListener("input", () => renderAppsTable(allApps));
+  document.getElementById("app-filter")?.addEventListener("change", () => renderAppsTable(allApps));
+
+  window.toggleAppStatus = async function(appId, newStatus) {
+    try {
+      await updateApp(appId, { status: newStatus });
+      showToast(`ステータスを「${newStatus === "public" ? "公開" : "非公開"}」に変更しました`, "success");
+      await loadApps();
+    } catch { showToast("変更に失敗しました", "error"); }
+  };
+
+  window.adminDeleteApp = async function(appId) {
+    if (!confirm("このアプリを削除しますか？")) return;
+    try {
+      await forceDeleteApp(appId);
+      showToast("削除しました", "success");
+      await loadApps();
+    } catch { showToast("削除に失敗しました", "error"); }
+  };
+
+  window.togglePickup = async function(appId, currentPickup) {
+    try {
+      await setPickup(appId, !currentPickup);
+      showToast(!currentPickup ? "ピックアップに追加しました ⭐" : "ピックアップを解除しました", "success");
+      await loadApps();
+    } catch { showToast("変更に失敗しました", "error"); }
+  };
+
+  // ========== ユーザー一覧 ==========
+  async function loadUsers() {
+    try {
+      allUsers = await getAllUsersAdmin();
+      document.getElementById("users-loading").style.display = "none";
+      document.getElementById("users-table").style.display = "";
+      document.getElementById("stat-total-users").textContent = allUsers.length;
+
+      document.getElementById("users-tbody").innerHTML = allUsers.map(u => `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              ${u.photoURL
+                ? `<img src="${escHtml(u.photoURL)}" alt="" style="width:30px;height:30px;border-radius:50%;object-fit:cover;">`
+                : `<div style="width:30px;height:30px;border-radius:50%;background:var(--moss-light);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;">${escHtml((u.displayName||"先")[0])}</div>`}
+              <span style="font-weight:600;">${escHtml(u.displayName||"---")}</span>
+            </div>
+          </td>
+          <td style="font-size:0.82rem;color:var(--text-sub);">${escHtml(u.email||"---")}</td>
+          <td>
+            <span class="badge ${u.role === 'admin' ? 'badge--moss' : 'badge--gray'}">
+              ${u.role === "admin" ? "🛡️ 管理者" : "👤 一般"}
+            </span>
+          </td>
+          <td>
+            <span class="status-badge ${u.banned ? 'badge badge--salmon' : 'status-public'}">
+              ${u.banned ? "🚫 停止中" : "✅ 有効"}
+            </span>
+          </td>
+          <td style="font-size:0.82rem;white-space:nowrap;">${formatDate(u.createdAt)}</td>
+          <td>
+            <div class="admin-action-btns">
+              ${!u.banned
+                ? `<button class="admin-btn admin-btn--ban" onclick="toggleBan('${escHtml(u.id)}', true)"><i class="fa fa-ban"></i> BAN</button>`
+                : `<button class="admin-btn admin-btn--unban" onclick="toggleBan('${escHtml(u.id)}', false)"><i class="fa fa-circle-check"></i> BAN解除</button>`}
+            </div>
+          </td>
+        </tr>`).join("") || `<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-sub);">ユーザーなし</td></tr>`;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  window.toggleBan = async function(uid, ban) {
+    if (!confirm(ban ? "このユーザーを利用停止にしますか？" : "BAN解除しますか？")) return;
+    try {
+      if (ban) await banUser(uid);
+      else     await unbanUser(uid);
+      showToast(ban ? "ユーザーを停止しました" : "BANを解除しました", "success");
+      await loadUsers();
+    } catch { showToast("操作に失敗しました", "error"); }
+  };
+
+  // ========== ピックアップ管理 ==========
+  async function loadPickupList() {
+    const container = document.getElementById("pickup-list");
+    const pickups = allApps.filter(a => a.pickup && a.status === "public")
+                           .sort((x,y) => (x.pickupOrder||999) - (y.pickupOrder||999));
+
+    if (!pickups.length) {
+      container.innerHTML = `<p class="text-sub" style="padding:20px 0;">ピックアップ中のアプリはありません。アプリ管理タブで設定してください。</p>`;
+      return;
+    }
+    container.innerHTML = pickups.map(app => `
+      <div class="pickup-item">
+        <div style="font-size:1.4rem;">${getEmoji(app.tags||[])}</div>
+        <div style="flex:1;min-width:0;">
+          <a href="app-detail.html?id=${escHtml(app.id)}" target="_blank"
+             style="font-weight:600;color:var(--moss-dark);text-decoration:none;font-size:0.9rem;">
+            ${escHtml(app.title)}
+          </a>
+          <p style="font-size:0.78rem;color:var(--text-sub);margin-top:2px;">${escHtml(app.authorName||"")}</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <label style="font-size:0.78rem;color:var(--text-sub);">順番</label>
+          <input type="number" class="pickup-order-input" value="${app.pickupOrder||999}"
+                 min="1" max="999" id="order-${escHtml(app.id)}" aria-label="表示順">
+          <button class="admin-btn admin-btn--pickup" onclick="savePickupOrder('${escHtml(app.id)}')">
+            <i class="fa fa-save"></i> 保存
+          </button>
+          <button class="admin-btn admin-btn--danger" onclick="togglePickup('${escHtml(app.id)}', true)">
+            <i class="fa fa-xmark"></i> 解除
+          </button>
+        </div>
+      </div>`).join("");
+  }
+
+  window.savePickupOrder = async function(appId) {
+    const order = parseInt(document.getElementById(`order-${appId}`)?.value) || 999;
+    try {
+      await setPickup(appId, true, order);
+      showToast("表示順を保存しました", "success");
+      await loadApps();
+      await loadPickupList();
+    } catch { showToast("保存に失敗しました", "error"); }
+  };
+
+  // ========== お知らせ管理 ==========
+  async function loadNoticesList() {
+    try {
+      const notices = await getNotices();
+      const container = document.getElementById("notices-list");
+      if (!notices.length) {
+        container.innerHTML = `<p class="text-sub" style="padding:10px 0;">お知らせはありません。</p>`;
+        return;
+      }
+      container.innerHTML = notices.map(n => `
+        <div class="notice-row">
+          <span class="badge badge--mustard" aria-hidden="true">📢</span>
+          <span class="notice-row__body">${escHtml(n.body)}</span>
+          <span class="notice-row__date">${formatDate(n.createdAt)}</span>
+          <button class="admin-btn admin-btn--danger" onclick="removeNotice('${escHtml(n.id)}')">
+            <i class="fa fa-xmark"></i> 削除
+          </button>
+        </div>`).join("");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  document.getElementById("add-notice-btn")?.addEventListener("click", async () => {
+    const body = document.getElementById("notice-input")?.value.trim();
+    if (!body) { showToast("お知らせ本文を入力してください", "warning"); return; }
+    try {
+      await addNotice({ body });
+      document.getElementById("notice-input").value = "";
+      showToast("お知らせを追加しました", "success");
+      await loadNoticesList();
+    } catch { showToast("追加に失敗しました", "error"); }
+  });
+
+  window.removeNotice = async function(noticeId) {
+    if (!confirm("このお知らせを削除しますか？")) return;
+    try {
+      await deleteNotice(noticeId);
+      showToast("お知らせを削除しました", "success");
+      await loadNoticesList();
+    } catch { showToast("削除に失敗しました", "error"); }
+  };
+</script>
+</body>
+</html>

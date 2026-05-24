@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="アプリ詳細 - 先生アプリ">
+  <title>アプリ詳細 - 先生アプリ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ========== アプリ詳細専用スタイル ========== */
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 32px;
+      padding: 48px 0 80px;
+      align-items: start;
+    }
+    /* メインコンテンツ */
+    .detail-main {}
+    .detail-thumb {
+      width: 100%;
+      height: 280px;
+      background: linear-gradient(135deg, #E8F0E4 0%, #D1E0CB 100%);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      border: 1.5px solid var(--border);
+    }
+    .detail-thumb img { width:100%; height:100%; object-fit:cover; }
+    .detail-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .detail-title { font-size: clamp(1.5rem,3vw,2.2rem); font-weight:700; margin-bottom:16px; color: var(--moss-dark); }
+    .detail-meta {
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+      font-size: 0.85rem; color: var(--text-sub);
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .detail-meta .author {
+      display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-main);
+    }
+    .detail-meta .author-icon {
+      width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+      background: var(--moss-light); color: #fff;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight:700;
+    }
+    .detail-section { margin-bottom: 32px; }
+    .detail-section h2 {
+      font-size: 1.05rem; font-weight: 700; color: var(--moss-dark);
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--mustard);
+    }
+    .detail-section p, .detail-section ul { font-size: 0.95rem; line-height: 1.8; color: var(--text-main); }
+    .detail-section ul { padding-left: 20px; list-style: disc; }
+
+    /* プロンプト */
+    .prompt-box {
+      background: var(--moss-dark);
+      color: #E8F5E4;
+      border-radius: var(--radius-md);
+      padding: 20px 22px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+      position: relative;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .prompt-copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .prompt-copy-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* サイドバー */
+    .detail-sidebar {}
+    .sidebar-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .sidebar-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--moss-dark); margin-bottom: 16px; }
+
+    /* アクションボタン群 */
+    .action-btns { display: flex; flex-direction: column; gap: 10px; }
+    .action-btn-link {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      font-size: 1rem; font-weight: 700;
+      text-decoration: none;
+      transition: all var(--transition);
+      border: none; cursor: pointer; width: 100%;
+    }
+    .action-btn--open {
+      background: var(--moss); color: #fff;
+    }
+    .action-btn--open:hover { background: var(--moss-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .action-btn--download {
+      background: var(--mustard); color: var(--text-main);
+    }
+    .action-btn--download:hover { background: #d4a63a; transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .action-btn--like {
+      background: var(--surface-2); color: var(--text-sub);
+      border: 1.5px solid var(--border);
+    }
+    .action-btn--like:hover, .action-btn--like.liked {
+      background: #FDDDD6; color: var(--salmon); border-color: var(--salmon);
+    }
+    .action-btn--share {
+      background: transparent; color: var(--text-sub);
+      border: 1.5px solid var(--border);
+    }
+    .action-btn--share:hover { border-color: var(--moss); color: var(--moss); }
+
+    /* メタ情報リスト */
+    .meta-list { display: flex; flex-direction: column; gap: 10px; }
+    .meta-list dt { font-size: 0.78rem; color: var(--text-light); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .meta-list dd { font-size: 0.9rem; color: var(--text-main); }
+
+    /* 警告ボックス */
+    .caution-box {
+      background: #FEF9C3; border: 1.5px solid #FDE047;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-size: 0.82rem;
+      color: #854D0E;
+      line-height: 1.6;
+    }
+
+    /* スクロールアンカー */
+    .toc { display: flex; flex-direction: column; gap: 6px; }
+    .toc a {
+      font-size: 0.85rem; color: var(--text-sub); text-decoration: none;
+      padding: 4px 8px; border-radius: var(--radius-sm);
+      transition: all var(--transition);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .toc a:hover { background: var(--surface-2); color: var(--moss); }
+
+    /* ========== レスポンシブ ========== */
+    @media (max-width: 860px) {
+      .detail-layout { grid-template-columns: 1fr; }
+      .detail-sidebar { order: -1; }
+    }
+    @media (max-width: 600px) {
+      .detail-thumb { height: 200px; font-size: 3.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+
+<!-- ヘッダー -->
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="site-logo">
+      <div class="site-logo__icon">🍀</div>
+      <div class="site-logo__text">先生<span>アプリ</span></div>
+    </a>
+    <nav class="site-nav">
+      <a href="/">ホーム</a>
+      <a href="apps.html">アプリ一覧</a>
+      <a href="about.html">このサイトについて</a>
+    </nav>
+    <div class="header-actions">
+      <button id="login-btn" class="btn btn--primary btn--sm">
+        <i class="fa fa-right-to-bracket"></i> ログイン
+      </button>
+      <a href="submit.html" id="post-btn" class="btn btn--mustard btn--sm hidden">
+        ＋ 投稿する
+      </a>
+      <div class="dropdown">
+        <button id="user-menu-btn" class="user-avatar hidden" data-dropdown-trigger aria-label="ユーザーメニュー">
+          <span id="user-avatar">👤</span>
+        </button>
+        <div class="dropdown-menu" id="dropdown-menu">
+          <span id="user-name-display" style="padding:10px 16px;font-size:0.82rem;color:var(--text-sub);display:block;border-bottom:1px solid var(--border);"></span>
+          <a href="mypage.html"><i class="fa fa-house"></i> マイページ</a>
+          <a href="submit.html"><i class="fa fa-plus-circle"></i> アプリを投稿</a>
+          <a href="admin.html" id="admin-link" class="hidden"><i class="fa fa-shield-halved"></i> 管理者画面</a>
+          <hr>
+          <button id="logout-btn"><i class="fa fa-right-from-bracket"></i> ログアウト</button>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger-btn" aria-label="メニュー" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/"><i class="fa fa-home"></i> ホーム</a>
+    <a href="apps.html"><i class="fa fa-grid-2"></i> アプリ一覧</a>
+    <a href="submit.html"><i class="fa fa-plus-circle"></i> アプリを投稿</a>
+    <a href="mypage.html"><i class="fa fa-user"></i> マイページ</a>
+  </div>
+</header>
+
+<!-- パンくずリスト -->
+<div class="container" style="padding-top:16px;padding-bottom:0;">
+  <nav aria-label="パンくずリスト">
+    <ol style="display:flex;align-items:center;gap:6px;font-size:0.83rem;color:var(--text-light);">
+      <li><a href="/" style="color:var(--moss);">ホーム</a></li>
+      <li aria-hidden="true"> / </li>
+      <li><a href="apps.html" style="color:var(--moss);">アプリ一覧</a></li>
+      <li aria-hidden="true"> / </li>
+      <li id="breadcrumb-title" aria-current="page">読み込み中...</li>
+    </ol>
+  </nav>
+</div>
+
+<!-- メインコンテンツ -->
+<main id="main-content">
+  <div class="container">
+
+    <!-- ローディング表示 -->
+    <div id="loading-state" style="text-align:center;padding:80px 0;">
+      <div class="loading-spinner" style="width:40px;height:40px;margin:0 auto 16px;"></div>
+      <p class="text-sub">読み込み中...</p>
+    </div>
+
+    <!-- エラー表示 -->
+    <div id="error-state" class="hidden" style="text-align:center;padding:80px 0;">
+      <div style="font-size:3rem;margin-bottom:16px;">😔</div>
+      <h2>アプリが見つかりませんでした</h2>
+      <p class="text-sub" style="margin-top:8px;margin-bottom:24px;">URLが間違っているか、削除された可能性があります。</p>
+      <a href="apps.html" class="btn btn--primary">アプリ一覧に戻る</a>
+    </div>
+
+    <!-- アプリ詳細本体 -->
+    <div id="app-content" class="hidden">
+      <div class="detail-layout">
+
+        <!-- ===== メインカラム ===== -->
+        <div class="detail-main">
+          <!-- サムネイル -->
+          <div id="detail-thumb" class="detail-thumb" role="img" aria-label="アプリのサムネイル">
+            🍀
+          </div>
+
+          <!-- タグ -->
+          <div id="detail-tags" class="detail-tags" aria-label="カテゴリタグ"></div>
+
+          <!-- タイトル -->
+          <h1 id="detail-title" class="detail-title">---</h1>
+
+          <!-- メタ情報 -->
+          <div class="detail-meta" aria-label="アプリ情報">
+            <div class="author">
+              <span id="detail-author-icon" class="author-icon">先</span>
+              <span id="detail-author-name">---</span>
+            </div>
+            <span id="detail-date"><i class="fa fa-calendar-alt"></i> ---</span>
+            <span id="detail-views"><i class="fa fa-eye"></i> ---</span>
+            <span id="detail-likes"><i class="fa fa-heart"></i> ---</span>
+          </div>
+
+          <!-- 概要 -->
+          <section class="detail-section" id="section-desc">
+            <h2><i class="fa fa-align-left" aria-hidden="true"></i> アプリの概要</h2>
+            <p id="detail-description">---</p>
+          </section>
+
+          <!-- 使い方 -->
+          <section class="detail-section" id="section-howto" style="display:none;">
+            <h2><i class="fa fa-circle-question" aria-hidden="true"></i> 使い方</h2>
+            <div id="detail-howto"></div>
+          </section>
+
+          <!-- AIプロンプト -->
+          <section class="detail-section" id="section-prompt" style="display:none;">
+            <h2><i class="fa fa-robot" aria-hidden="true"></i> 使ったAIプロンプト（呪文）</h2>
+            <p style="font-size:0.85rem;color:var(--text-sub);margin-bottom:12px;">
+              このアプリを作るためにAIに入力したプロンプトです。コピーして自由にカスタマイズしてください。
+            </p>
+            <div class="prompt-box" id="detail-prompt">
+              <button class="prompt-copy-btn" id="copy-prompt-btn" aria-label="プロンプトをコピー">
+                <i class="fa fa-copy"></i> コピー
+              </button>
+              <span id="prompt-text"></span>
+            </div>
+          </section>
+
+          <!-- ソースコード -->
+          <section class="detail-section" id="section-source" style="display:none;">
+            <h2><i class="fa fa-code" aria-hidden="true"></i> ソースコード（概要）</h2>
+            <p style="font-size:0.85rem;color:var(--text-sub);margin-bottom:12px;">
+              HTMLファイルをダウンロードして中身を確認できます。
+            </p>
+          </section>
+
+          <!-- 注意事項 -->
+          <section class="detail-section" id="section-caution">
+            <h2><i class="fa fa-triangle-exclamation" aria-hidden="true"></i> ご利用の注意</h2>
+            <div class="caution-box">
+              <p>⚠️ このアプリは先生が個人的にAIを用いて作成したものです。本サイトはアプリの動作・正確性・安全性を保証しません。</p>
+              <p style="margin-top:8px;">📋 各学校のセキュリティ規定への準拠は、ご利用の先生ご自身でご判断ください。</p>
+              <p style="margin-top:8px;">🔒 ローカル動作ツールは端末内でのみ動作し、外部にデータを送信しません（投稿者の申告に基づく）。</p>
+            </div>
+          </section>
+        </div>
+
+        <!-- ===== サイドバー ===== -->
+        <aside class="detail-sidebar" aria-label="アプリ操作">
+
+          <!-- アクションカード -->
+          <div class="sidebar-card">
+            <h3>このアプリを使う</h3>
+            <div class="action-btns">
+              <!-- リンク型 -->
+              <a id="btn-open-link" href="#" target="_blank" rel="noopener noreferrer"
+                 class="action-btn-link action-btn--open" style="display:none;">
+                <i class="fa fa-arrow-up-right-from-square"></i>
+                アプリを開く（外部リンク）
+              </a>
+              <!-- HTML型 -->
+              <a id="btn-download" href="#" download
+                 class="action-btn-link action-btn--download" style="display:none;">
+                <i class="fa fa-download"></i>
+                HTMLファイルをダウンロード
+              </a>
+              <!-- いいねボタン -->
+              <button id="btn-like" class="action-btn-link action-btn--like" aria-label="いいね">
+                <i class="fa fa-heart"></i>
+                <span id="like-count-btn">いいね</span>
+              </button>
+              <!-- 共有ボタン -->
+              <button id="btn-share" class="action-btn-link action-btn--share" aria-label="共有">
+                <i class="fa fa-share-nodes"></i>
+                このページを共有
+              </button>
+            </div>
+
+            <!-- ローカル動作ツール注意書き -->
+            <div id="local-caution" style="display:none;margin-top:14px;">
+              <div class="alert alert--info" style="font-size:0.82rem;">
+                <i class="fa fa-circle-info"></i>
+                <div>
+                  <strong>使い方：</strong>ダウンロードしたHTMLファイルをダブルクリックするだけ！インターネット不要で動作します。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- メタ情報 -->
+          <div class="sidebar-card">
+            <h3>アプリ情報</h3>
+            <dl class="meta-list">
+              <dt>投稿者</dt>
+              <dd id="meta-author">---</dd>
+              <dt style="margin-top:10px;">投稿日</dt>
+              <dd id="meta-date">---</dd>
+              <dt style="margin-top:10px;">最終更新</dt>
+              <dd id="meta-updated">---</dd>
+              <dt style="margin-top:10px;">提供方法</dt>
+              <dd id="meta-type">---</dd>
+              <dt style="margin-top:10px;">閲覧数</dt>
+              <dd id="meta-views">---</dd>
+              <dt style="margin-top:10px;">いいね数</dt>
+              <dd id="meta-likes">---</dd>
+            </dl>
+          </div>
+
+          <!-- 目次 -->
+          <div class="sidebar-card">
+            <h3>目次</h3>
+            <nav class="toc" aria-label="ページ内目次">
+              <a href="#section-desc"><i class="fa fa-align-left"></i> 概要</a>
+              <a href="#section-howto" id="toc-howto"><i class="fa fa-circle-question"></i> 使い方</a>
+              <a href="#section-prompt" id="toc-prompt"><i class="fa fa-robot"></i> AIプロンプト</a>
+              <a href="#section-caution"><i class="fa fa-triangle-exclamation"></i> 注意事項</a>
+            </nav>
+          </div>
+
+          <!-- 管理ボタン（投稿者・管理者のみ） -->
+          <div class="sidebar-card" id="edit-card" style="display:none;">
+            <h3>⚙️ 管理</h3>
+            <div class="action-btns">
+              <a id="btn-edit" href="#" class="btn btn--secondary btn--full">
+                <i class="fa fa-pen"></i> 編集する
+              </a>
+              <button id="btn-delete" class="btn btn--ghost btn--full" style="color:var(--salmon);border-color:var(--salmon);">
+                <i class="fa fa-trash"></i> 削除する
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div><!-- /#app-content -->
+
+  </div>
+</main>
+
+<!-- フッター -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="site-logo">
+          <div class="site-logo__icon" style="background:rgba(255,255,255,0.2);">🍀</div>
+          <div class="site-logo__text">先生<span style="color:var(--salmon);">アプリ</span></div>
+        </a>
+        <p>先生たちがAIで自作したWebアプリを共有するプラットフォーム。</p>
+      </div>
+      <div class="footer-col">
+        <h4>サイトメニュー</h4>
+        <ul>
+          <li><a href="/">ホーム</a></li>
+          <li><a href="apps.html">アプリ一覧</a></li>
+          <li><a href="submit.html">アプリを投稿</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>法的情報</h4>
+        <ul>
+          <li><a href="terms.html">利用規約</a></li>
+          <li><a href="privacy.html">プライバシーポリシー</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 先生アプリ. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container" aria-live="polite"></div>
+
+<!-- 削除確認モーダル -->
+<div class="modal-overlay" id="delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+  <div class="modal">
+    <h3 id="delete-modal-title" style="margin-bottom:12px;">🗑️ アプリを削除しますか？</h3>
+    <p style="font-size:0.9rem;color:var(--text-sub);margin-bottom:24px;">
+      削除したアプリは元に戻せません。本当に削除しますか？
+    </p>
+    <div style="display:flex;gap:12px;">
+      <button id="confirm-delete" class="btn btn--salmon btn--full">削除する</button>
+      <button onclick="document.getElementById('delete-modal').classList.remove('open')" class="btn btn--ghost btn--full">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import {
+    auth, getApp, incrementView, toggleLike, hasLiked,
+    deleteApp, onAuthStateChanged, getUserDoc
+  } from "./js/firebase.js";
+
+  function escHtml(s) {
+    return String(s ?? "").replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function formatDate(ts) {
+    if (!ts) return "---";
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString("ja-JP", { year:"numeric", month:"long", day:"numeric" });
+  }
+  function showToast(msg, type="default") {
+    const c = document.getElementById("toast-container");
+    const icons = {success:"✅",error:"❌",warning:"⚠️",default:"📢"};
+    const t = document.createElement("div");
+    t.className = `toast toast--${type}`;
+    t.innerHTML = `<span>${icons[type]||icons.default}</span><span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+
+  const params = new URLSearchParams(location.search);
+  const appId  = params.get("id");
+
+  if (!appId) {
+    showError();
+  } else {
+    loadApp();
+  }
+
+  function showError() {
+    document.getElementById("loading-state").classList.add("hidden");
+    document.getElementById("error-state").classList.remove("hidden");
+  }
+
+  async function loadApp() {
+    try {
+      const app = await getApp(appId);
+      if (!app || app.status === "deleted") { showError(); return; }
+
+      // 閲覧数カウント
+      try { await incrementView(appId); } catch {}
+
+      renderApp(app);
+      document.getElementById("loading-state").classList.add("hidden");
+      document.getElementById("app-content").classList.remove("hidden");
+
+      // 認証状態確認後にいいね・管理ボタン
+      onAuthStateChanged(auth, async (user) => {
+        setupHeader(user);
+        setupLike(app, user);
+        await setupEditButtons(app, user);
+      });
+    } catch (e) {
+      console.error(e);
+      showError();
+    }
+  }
+
+  function renderApp(app) {
+    // OGP タイトル更新
+    document.title = `${app.title} - 先生アプリ`;
+    document.querySelector('meta[name="description"]').content = app.description || "";
+
+    // パンくず
+    document.getElementById("breadcrumb-title").textContent = app.title;
+
+    // サムネイル
+    const thumb = document.getElementById("detail-thumb");
+    if (app.thumbnailUrl) {
+      thumb.innerHTML = `<img src="${escHtml(app.thumbnailUrl)}" alt="${escHtml(app.title)}">`;
+    } else {
+      const emojis = {"校務支援":"📋","学級経営":"🏫","授業・教材":"📚","評価・採点":"✅","保護者連絡":"📨","特別支援":"🤝","ICT活用":"💻","部活・行事":"🎉","その他":"🌟"};
+      const emoji = (app.tags||[]).map(t => emojis[t]).find(Boolean) || "🍀";
+      thumb.textContent = emoji;
+    }
+    thumb.setAttribute("aria-label", app.title);
+
+    // タグ
+    const tagEl = document.getElementById("detail-tags");
+    const offlineBadgeHtml = app.offlineSupport
+      ? `<span class="badge badge--offline" title="インターネット不要で動作します">📴 オフライン動作対応</span>`
+      : "";
+    tagEl.innerHTML = (app.tags||[]).map(t =>
+      `<a href="apps.html?tag=${encodeURIComponent(t)}" class="badge badge--moss">${escHtml(t)}</a>`
+    ).join("") + (app.shareType === "html"
+      ? `<span class="badge badge--green">📦 ローカル動作</span>`
+      : `<span class="badge badge--gray">🔗 リンク</span>`) + offlineBadgeHtml;
+
+    // タイトル
+    document.getElementById("detail-title").textContent = app.title;
+
+    // 著者
+    const authorIcon = document.getElementById("detail-author-icon");
+    if (app.authorPhoto) {
+      authorIcon.innerHTML = `<img src="${escHtml(app.authorPhoto)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    } else {
+      authorIcon.textContent = (app.authorName||"先")[0];
+    }
+    document.getElementById("detail-author-name").textContent = app.authorName || "先生";
+    document.getElementById("detail-date").innerHTML   = `<i class="fa fa-calendar-alt"></i> ${formatDate(app.createdAt)}`;
+    document.getElementById("detail-views").innerHTML  = `<i class="fa fa-eye"></i> ${(app.viewCount||0).toLocaleString()} 閲覧`;
+    document.getElementById("detail-likes").innerHTML  = `<i class="fa fa-heart"></i> ${(app.likeCount||0).toLocaleString()} いいね`;
+
+    // 概要
+    document.getElementById("detail-description").textContent = app.description || "";
+
+    // 使い方
+    if (app.howto) {
+      document.getElementById("section-howto").style.display = "";
+      document.getElementById("toc-howto").style.display = "";
+      document.getElementById("detail-howto").innerHTML =
+        `<p style="white-space:pre-wrap;">${escHtml(app.howto)}</p>`;
+    }
+
+    // プロンプト
+    if (app.prompt) {
+      document.getElementById("section-prompt").style.display = "";
+      document.getElementById("toc-prompt").style.display = "";
+      document.getElementById("prompt-text").textContent = app.prompt;
+    }
+
+    // アクションボタン
+    if (app.shareType === "html" && app.htmlFileUrl) {
+      const dlBtn = document.getElementById("btn-download");
+      dlBtn.href = app.htmlFileUrl;
+      dlBtn.download = `${app.title}.html`;
+      dlBtn.style.display = "";
+      document.getElementById("local-caution").style.display = "";
+    }
+    if (app.shareType === "link" && app.appUrl) {
+      const openBtn = document.getElementById("btn-open-link");
+      openBtn.href = app.appUrl;
+      openBtn.style.display = "";
+    }
+
+    // いいね数ボタン
+    document.getElementById("like-count-btn").textContent = `いいね (${app.likeCount||0})`;
+
+    // サイドバーメタ
+    document.getElementById("meta-author").textContent  = app.authorName || "先生";
+    document.getElementById("meta-date").textContent    = formatDate(app.createdAt);
+    document.getElementById("meta-updated").textContent = formatDate(app.updatedAt);
+    const metaTypeEl = document.getElementById("meta-type");
+    let metaTypeText  = app.shareType === "html" ? "📦 HTMLダウンロード" : "🔗 外部リンク";
+    if (app.offlineSupport) {
+      metaTypeEl.innerHTML = metaTypeText +
+        ` <span class="badge badge--offline" style="font-size:0.75rem;vertical-align:middle;">📴 オフライン対応</span>`;
+    } else {
+      metaTypeEl.textContent = metaTypeText;
+    }
+    document.getElementById("meta-views").textContent   = `${(app.viewCount||0).toLocaleString()} 回`;
+    document.getElementById("meta-likes").textContent   = `${(app.likeCount||0).toLocaleString()} 件`;
+  }
+
+  // ========== いいね機能 ==========
+  function setupLike(app, user) {
+    const btn = document.getElementById("btn-like");
+    btn.addEventListener("click", async () => {
+      if (!user) {
+        showToast("いいねするにはログインが必要です。", "warning");
+        return;
+      }
+      try {
+        const liked = await toggleLike(appId, user.uid);
+        btn.classList.toggle("liked", liked);
+        const current = parseInt((document.getElementById("like-count-btn").textContent.match(/\d+/)||["0"])[0]);
+        const newCount = liked ? current + 1 : current - 1;
+        document.getElementById("like-count-btn").textContent = `いいね (${newCount})`;
+        document.getElementById("detail-likes").innerHTML = `<i class="fa fa-heart"></i> ${newCount} いいね`;
+        document.getElementById("meta-likes").textContent = `${newCount} 件`;
+        showToast(liked ? "いいねしました！❤️" : "いいねを取り消しました", liked ? "success" : "default");
+      } catch { showToast("エラーが発生しました", "error"); }
+    });
+
+    // 既にいいね済みか確認
+    if (user) {
+      hasLiked(appId, user.uid).then(liked => {
+        btn.classList.toggle("liked", liked);
+      });
+    }
+  }
+
+  // ========== 共有ボタン ==========
+  document.getElementById("btn-share").addEventListener("click", async () => {
+    const url = location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: document.title, url });
+      } catch {}
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast("URLをコピーしました！", "success");
+      } catch { showToast("コピーに失敗しました", "error"); }
+    }
+  });
+
+  // ========== プロンプトコピー ==========
+  document.getElementById("copy-prompt-btn")?.addEventListener("click", async () => {
+    const text = document.getElementById("prompt-text").textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("プロンプトをコピーしました！", "success");
+    } catch { showToast("コピーに失敗しました", "error"); }
+  });
+
+  // ========== 編集・削除ボタン ==========
+  async function setupEditButtons(app, user) {
+    if (!user) return;
+    const userDoc = await getUserDoc(user.uid);
+    const isOwner = app.authorUid === user.uid;
+    const isAdm   = userDoc?.role === "admin";
+
+    if (isOwner || isAdm) {
+      document.getElementById("edit-card").style.display = "";
+      document.getElementById("btn-edit").href = `submit.html?edit=${appId}`;
+    }
+  }
+
+  document.getElementById("btn-delete")?.addEventListener("click", () => {
+    document.getElementById("delete-modal").classList.add("open");
+  });
+  document.getElementById("confirm-delete")?.addEventListener("click", async () => {
+    try {
+      await deleteApp(appId);
+      showToast("アプリを削除しました", "success");
+      setTimeout(() => { location.href = "mypage.html"; }, 1500);
+    } catch { showToast("削除に失敗しました", "error"); }
+  });
+
+  // ========== ヘッダー認証UI ==========
+  function setupHeader(user) {
+    const loginBtn  = document.getElementById("login-btn");
+    const menuBtn   = document.getElementById("user-menu-btn");
+    const postBtn   = document.getElementById("post-btn");
+    const avatar    = document.getElementById("user-avatar");
+    const nameEl    = document.getElementById("user-name-display");
+
+    if (user) {
+      loginBtn?.classList.add("hidden");
+      menuBtn?.classList.remove("hidden");
+      postBtn?.classList.remove("hidden");
+      if (avatar) avatar.innerHTML = user.photoURL
+        ? `<img src="${user.photoURL}" alt="">` : (user.displayName||"先")[0];
+      if (nameEl) nameEl.textContent = user.displayName || "先生";
+    } else {
+      loginBtn?.classList.remove("hidden");
+      menuBtn?.classList.add("hidden");
+      postBtn?.classList.add("hidden");
+    }
+    loginBtn?.addEventListener("click", async () => {
+      const { loginWithGoogle } = await import("./js/firebase.js");
+      try { await loginWithGoogle(); }
+      catch { showToast("ログインに失敗しました", "error"); }
+    });
+    document.getElementById("logout-btn")?.addEventListener("click", async () => {
+      const { logout } = await import("./js/firebase.js");
+      await logout(); location.href = "/";
+    });
+    document.getElementById("user-menu-btn")?.addEventListener("click", e => {
+      e.stopPropagation();
+      document.getElementById("dropdown-menu")?.classList.toggle("open");
+    });
+    document.addEventListener("click", () => {
+      document.getElementById("dropdown-menu")?.classList.remove("open");
+    });
+  }
+
+  // ========== ハンバーガー ==========
+  document.getElementById("hamburger-btn")?.addEventListener("click", () => {
+    const m = document.getElementById("mobile-menu");
+    m.classList.toggle("open");
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アプリを投稿する - 先生アプリ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ===== 投稿フォーム専用スタイル ===== */
+    .submit-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 32px;
+      padding: 48px 0 80px;
+      align-items: start;
+    }
+    .submit-form { background: var(--surface); border-radius: var(--radius-xl); border: 1.5px solid var(--border); padding: 36px; }
+    .form-section { margin-bottom: 36px; padding-bottom: 36px; border-bottom: 1.5px dashed var(--border); }
+    .form-section:last-of-type { border-bottom: none; margin-bottom: 0; }
+    .form-section-title {
+      font-size: 1rem; font-weight: 700; color: var(--moss-dark);
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--mustard);
+    }
+
+    /* タグセレクター */
+    .tag-selector { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag-selector input[type="checkbox"] { display: none; }
+    .tag-selector label {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all var(--transition);
+      background: var(--surface);
+      color: var(--text-sub);
+      user-select: none;
+    }
+    .tag-selector input[type="checkbox"]:checked + label {
+      background: var(--moss); color: #fff; border-color: var(--moss);
+    }
+
+    /* 共有方式の選択 */
+    .share-type-options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .share-type-option input[type="radio"] { display: none; }
+    .share-type-option label {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      padding: 20px 16px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all var(--transition);
+      text-align: center;
+      background: var(--bg);
+    }
+    .share-type-option input[type="radio"]:checked + label {
+      border-color: var(--moss);
+      background: #E8F0E4;
+      box-shadow: 0 0 0 3px rgba(74,103,65,0.15);
+    }
+    .share-type-option label:hover { border-color: var(--moss-light); }
+    .share-type-option .option-icon { font-size: 2rem; }
+    .share-type-option .option-title { font-weight: 700; font-size: 0.95rem; color: var(--moss-dark); }
+    .share-type-option .option-desc  { font-size: 0.8rem; color: var(--text-sub); line-height: 1.5; }
+
+    /* ファイルアップロードエリア */
+    .file-drop {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+      background: var(--bg);
+    }
+    .file-drop:hover, .file-drop.drag-over {
+      border-color: var(--moss);
+      background: #E8F0E4;
+    }
+    .file-drop__icon { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+    .file-drop__text { font-size: 0.88rem; color: var(--text-sub); }
+    .file-drop__selected { font-size: 0.88rem; color: var(--moss); font-weight: 600; margin-top: 8px; }
+    #html-file-input { display: none; }
+
+    /* サイドバーのヒント */
+    .hint-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 22px; margin-bottom: 16px; }
+    .hint-card h3 { font-size: 0.9rem; font-weight: 700; color: var(--moss-dark); margin-bottom: 10px; }
+    .hint-card ul { padding-left: 0; }
+    .hint-card ul li {
+      font-size: 0.83rem; color: var(--text-sub); line-height: 1.7;
+      padding: 4px 0; border-bottom: 1px dashed var(--border);
+      display: flex; align-items: flex-start; gap: 6px;
+    }
+    .hint-card ul li:last-child { border-bottom: none; }
+
+    /* ステップ表示 */
+    .steps { display: flex; gap: 4px; align-items: center; margin-bottom: 24px; }
+    .step {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.82rem; font-weight: 600; color: var(--text-light);
+    }
+    .step.active { color: var(--moss); }
+    .step.done   { color: var(--mustard); }
+    .step__num {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--border); color: #fff;
+      font-size: 0.75rem; display: flex; align-items: center; justify-content: center;
+    }
+    .step.active .step__num { background: var(--moss); }
+    .step.done   .step__num { background: var(--mustard); color: var(--text-main); }
+    .step-divider { flex: 1; height: 1.5px; background: var(--border); max-width: 40px; }
+
+    @media (max-width: 860px) {
+      .submit-layout { grid-template-columns: 1fr; }
+      .submit-sidebar { order: -1; }
+    }
+    @media (max-width: 600px) {
+      .share-type-options { grid-template-columns: 1fr; }
+      .submit-form { padding: 24px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<a href="#submit-main" class="skip-link">メインコンテンツへスキップ</a>
+
+<!-- ヘッダー -->
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="site-logo">
+      <div class="site-logo__icon">🍀</div>
+      <div class="site-logo__text">先生<span>アプリ</span></div>
+    </a>
+    <nav class="site-nav">
+      <a href="/">ホーム</a>
+      <a href="apps.html">アプリ一覧</a>
+    </nav>
+    <div class="header-actions">
+      <button id="login-btn" class="btn btn--primary btn--sm"><i class="fa fa-right-to-bracket"></i> ログイン</button>
+      <div class="dropdown">
+        <button id="user-menu-btn" class="user-avatar hidden" data-dropdown-trigger aria-label="ユーザーメニュー">
+          <span id="user-avatar">👤</span>
+        </button>
+        <div class="dropdown-menu" id="dropdown-menu">
+          <span id="user-name-display" style="padding:10px 16px;font-size:0.82rem;color:var(--text-sub);display:block;border-bottom:1px solid var(--border);"></span>
+          <a href="mypage.html"><i class="fa fa-house"></i> マイページ</a>
+          <hr>
+          <button id="logout-btn"><i class="fa fa-right-from-bracket"></i> ログアウト</button>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger-btn" aria-label="メニュー" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/"><i class="fa fa-home"></i> ホーム</a>
+    <a href="apps.html"><i class="fa fa-grid-2"></i> アプリ一覧</a>
+    <a href="mypage.html"><i class="fa fa-user"></i> マイページ</a>
+  </div>
+</header>
+
+<!-- ページヒーロー -->
+<div class="page-hero">
+  <div class="container">
+    <p class="page-hero__label">SUBMIT</p>
+    <h1 id="page-title">アプリを投稿する</h1>
+    <p>作ったアプリを全国の先生とシェアしよう。プロンプトも一緒に公開してください。</p>
+  </div>
+</div>
+
+<!-- ログインが必要なメッセージ（未ログイン時） -->
+<div id="login-required" class="hidden">
+  <div class="container" style="padding:80px 20px;text-align:center;">
+    <div style="font-size:3rem;margin-bottom:16px;">🔐</div>
+    <h2>ログインが必要です</h2>
+    <p class="text-sub" style="margin-top:8px;margin-bottom:24px;">アプリを投稿するにはGoogleアカウントでログインしてください。</p>
+    <button id="login-required-btn" class="btn btn--primary btn--lg">
+      <i class="fa fa-right-to-bracket"></i> Googleでログイン
+    </button>
+  </div>
+</div>
+
+<!-- メインフォーム -->
+<main id="submit-main" class="hidden">
+  <div class="container">
+    <div class="submit-layout">
+
+      <!-- ===== フォーム ===== -->
+      <div>
+        <!-- ステップ表示 -->
+        <div class="steps" aria-label="投稿ステップ">
+          <div class="step done" id="step1">
+            <div class="step__num">1</div>
+            <span>基本情報</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="step active" id="step2">
+            <div class="step__num">2</div>
+            <span>共有方法</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="step" id="step3">
+            <div class="step__num">3</div>
+            <span>プロンプト</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="step" id="step4">
+            <div class="step__num">4</div>
+            <span>確認・投稿</span>
+          </div>
+        </div>
+
+        <form id="submit-form" novalidate>
+          <div class="submit-form">
+
+            <!-- ===== セクション1：基本情報 ===== -->
+            <div class="form-section">
+              <h2 class="form-section-title">
+                <i class="fa fa-circle-info" aria-hidden="true"></i> 1. 基本情報
+              </h2>
+
+              <div class="form-group">
+                <label class="form-label" for="field-title">
+                  アプリのタイトル <span class="required">*必須</span>
+                </label>
+                <input type="text" id="field-title" name="title" class="form-input"
+                       placeholder="例：所見文章ジェネレーター" maxlength="60" required
+                       aria-describedby="title-hint">
+                <p class="form-hint" id="title-hint">わかりやすく簡潔なタイトルをつけてください（60文字以内）</p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="field-description">
+                  アプリの概要説明 <span class="required">*必須</span>
+                </label>
+                <textarea id="field-description" name="description" class="form-textarea"
+                          placeholder="このアプリで何ができるか、どんな場面で役立つかを説明してください。"
+                          rows="4" maxlength="500" required aria-describedby="desc-hint"></textarea>
+                <p class="form-hint" id="desc-hint">
+                  <span id="desc-count">0</span>/500文字
+                </p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="field-howto">使い方・操作手順</label>
+                <textarea id="field-howto" name="howto" class="form-textarea"
+                          placeholder="1. ○○を入力する&#10;2. ボタンをクリックする&#10;3. 結果をコピーする"
+                          rows="4" maxlength="1000"></textarea>
+                <p class="form-hint">任意。箇条書きで手順を書いてください。</p>
+              </div>
+
+              <div class="form-group">
+                <fieldset>
+                  <legend class="form-label">カテゴリタグ <span class="required">*1つ以上選択</span></legend>
+                  <div class="tag-selector" role="group" aria-label="カテゴリを選択">
+                    <span><input type="checkbox" name="tags" id="tag-1" value="校務支援"><label for="tag-1">📋 校務支援</label></span>
+                    <span><input type="checkbox" name="tags" id="tag-2" value="学級経営"><label for="tag-2">🏫 学級経営</label></span>
+                    <span><input type="checkbox" name="tags" id="tag-3" value="授業・教材"><label for="tag-3">📚 授業・教材</label></span>
+                    <span><input type="checkbox" name="tags" id="tag-4" value="評価・採点"><label for="tag-4">✅ 評価・採点</label></span>
+                    <span><input type="checkbox" name="tags" id="tag-5" value="保護者連絡"><label for="tag-5">📨 保護者連絡</label></span>
+                    <span><input type="checkbox" name="tags" id="tag-6" value="特別支援"><label for="tag-6">🤝 特別支援</label></span>
+                    <span><input type="checkbox" name="tags" id="tag-7" value="ICT活用"><label for="tag-7">💻 ICT活用</label></span>
+                    <span><input type="checkbox" name="tags" id="tag-8" value="部活・行事"><label for="tag-8">🎉 部活・行事</label></span>
+                    <span><input type="checkbox" name="tags" id="tag-9" value="その他"><label for="tag-9">🌟 その他</label></span>
+                  </div>
+                  <p class="form-error hidden" id="tags-error">1つ以上選択してください</p>
+                </fieldset>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="field-thumbnail">サムネイル画像URL（任意）</label>
+                <input type="url" id="field-thumbnail" name="thumbnailUrl" class="form-input"
+                       placeholder="https://example.com/image.png"
+                       aria-describedby="thumb-hint">
+                <p class="form-hint" id="thumb-hint">アプリのスクリーンショット等のURLを入力（省略可）。省略時はカテゴリに合わせた絵文字が表示されます。</p>
+              </div>
+            </div>
+
+            <!-- ===== セクション2：共有方法 ===== -->
+            <div class="form-section">
+              <h2 class="form-section-title">
+                <i class="fa fa-share-nodes" aria-hidden="true"></i> 2. 共有方法
+              </h2>
+
+              <div class="form-group">
+                <fieldset>
+                  <legend class="form-label">共有タイプを選んでください <span class="required">*必須</span></legend>
+                  <div class="share-type-options" role="radiogroup" aria-label="共有タイプの選択">
+                    <div class="share-type-option">
+                      <input type="radio" name="shareType" id="type-link" value="link" checked>
+                      <label for="type-link">
+                        <span class="option-icon">🔗</span>
+                        <span class="option-title">リンク共有型</span>
+                        <span class="option-desc">すでに公開しているWebアプリのURLを登録する</span>
+                      </label>
+                    </div>
+                    <div class="share-type-option">
+                      <input type="radio" name="shareType" id="type-html" value="html">
+                      <label for="type-html">
+                        <span class="option-icon">📦</span>
+                        <span class="option-title">HTMLファイル型</span>
+                        <span class="option-desc">1ファイルのHTMLをアップロード。ダウンロードしてオフラインで使える</span>
+                      </label>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+
+              <!-- リンク入力（リンク型の場合） -->
+              <div id="link-section">
+                <div class="form-group">
+                  <label class="form-label" for="field-app-url">
+                    アプリのURL <span class="required">*必須</span>
+                  </label>
+                  <input type="url" id="field-app-url" name="appUrl" class="form-input"
+                         placeholder="https://your-app.vercel.app"
+                         aria-describedby="url-hint">
+                  <p class="form-hint" id="url-hint">公開済みのアプリのURLを入力してください</p>
+                  <p class="form-error hidden" id="url-error">有効なURLを入力してください</p>
+                </div>
+              </div>
+
+              <!-- HTMLアップロード（HTML型の場合） -->
+              <div id="html-section" class="hidden">
+                <div class="alert alert--warning" style="margin-bottom:16px;">
+                  <i class="fa fa-triangle-exclamation"></i>
+                  <div>
+                    <strong>重要：</strong>アップロードするHTMLファイルには悪意のあるコードを含めないでください。
+                    違反が確認された場合は即時削除・アカウント停止となります。
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    HTMLファイル <span class="required">*必須</span>
+                  </label>
+                  <div class="file-drop" id="file-drop-area" tabindex="0" role="button"
+                       aria-label="HTMLファイルをドラッグ＆ドロップまたはクリックして選択">
+                    <input type="file" id="html-file-input" accept=".html,.htm" aria-label="HTMLファイルを選択">
+                    <span class="file-drop__icon">📄</span>
+                    <p class="file-drop__text">ここにHTMLファイルをドラッグ＆ドロップ<br>またはクリックして選択</p>
+                    <p class="file-drop__text" style="margin-top:6px;font-size:0.78rem;">(.html / .htm のみ対応・最大5MB)</p>
+                    <p class="file-drop__selected hidden" id="selected-file-name"></p>
+                  </div>
+                  <p class="form-error hidden" id="file-error">HTMLファイルを選択してください</p>
+                </div>
+              </div>
+
+              <!-- ===== オフライン動作対応チェック ===== -->
+              <div class="form-group" style="margin-top:20px;">
+                <fieldset>
+                  <legend class="form-label" style="margin-bottom:10px;">
+                    <i class="fa fa-wifi-slash" style="color:var(--moss);"></i>
+                    オフライン動作対応
+                  </legend>
+                  <label id="offline-check-label" style="
+                    display:flex; align-items:flex-start; gap:12px; cursor:pointer;
+                    background:var(--bg); border:1.5px solid var(--border);
+                    border-radius:var(--radius-md); padding:16px 18px;
+                    transition:all var(--transition);
+                  ">
+                    <input type="checkbox" id="field-offline" name="offlineSupport"
+                           style="width:20px;height:20px;margin-top:1px;flex-shrink:0;accent-color:var(--moss);"
+                           aria-describedby="offline-hint">
+                    <div>
+                      <span style="font-weight:700;font-size:0.95rem;color:var(--moss-dark);display:block;margin-bottom:4px;">
+                        📴 このアプリはオフライン（インターネット不要）で動作します
+                      </span>
+                      <span style="font-size:0.83rem;color:var(--text-sub);line-height:1.6;" id="offline-hint">
+                        チェックすると「オフライン動作対応」バッジが表示され、フィルター検索の対象になります。<br>
+                        学校のネット制限環境でも使えるアプリに付けてください。
+                      </span>
+                    </div>
+                  </label>
+                  <!-- チェック時に表示されるプレビューバッジ -->
+                  <div id="offline-preview" class="hidden" style="margin-top:10px;">
+                    <span style="font-size:0.82rem;color:var(--text-sub);">表示イメージ：</span>
+                    <span class="badge badge--offline" style="margin-left:6px;">📴 オフライン動作対応</span>
+                  </div>
+                </fieldset>
+              </div>
+
+            </div>
+
+            <!-- ===== セクション3：AIプロンプト ===== -->
+            <div class="form-section">
+              <h2 class="form-section-title">
+                <i class="fa fa-robot" aria-hidden="true"></i> 3. AIプロンプト（任意・強く推奨）
+              </h2>
+              <div class="alert alert--info" style="margin-bottom:16px;">
+                <i class="fa fa-circle-info"></i>
+                <div>
+                  プロンプトを公開することで、他の先生がカスタマイズして使えるようになります。ぜひシェアしてください！
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="field-prompt">このアプリを作ったAIプロンプト</label>
+                <textarea id="field-prompt" name="prompt" class="form-textarea"
+                          placeholder="例：以下の条件でHTMLアプリを作ってください。&#10;- 学校の先生が使う所見文章ジェネレーター&#10;- 子どもの特徴を入力すると所見文章が生成される&#10;..."
+                          rows="6" maxlength="5000"></textarea>
+                <p class="form-hint">Gemini、ChatGPT等に入力したプロンプトをそのまま貼り付けてください。</p>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="field-ai-tool">使用したAIツール</label>
+                <select id="field-ai-tool" name="aiTool" class="form-select">
+                  <option value="">選択しない</option>
+                  <option value="Gemini">Gemini</option>
+                  <option value="ChatGPT">ChatGPT</option>
+                  <option value="Claude">Claude</option>
+                  <option value="Genspark">Genspark</option>
+                  <option value="その他">その他</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- ===== セクション4：利用規約同意 ===== -->
+            <div class="form-section">
+              <h2 class="form-section-title">
+                <i class="fa fa-file-contract" aria-hidden="true"></i> 4. 確認事項
+              </h2>
+              <div class="alert alert--warning" style="margin-bottom:20px;">
+                <i class="fa fa-triangle-exclamation"></i>
+                <div>
+                  投稿したアプリは公開され、全国の先生が閲覧・ダウンロードできます。
+                  個人情報・機密情報が含まれていないか確認してください。
+                </div>
+              </div>
+              <div class="form-group">
+                <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+                  <input type="checkbox" id="agree-terms" name="agreeTerms" style="width:18px;height:18px;margin-top:2px;flex-shrink:0;" required>
+                  <span style="font-size:0.9rem;line-height:1.7;">
+                    <a href="terms.html" target="_blank" style="color:var(--moss);text-decoration:underline;">利用規約</a>に同意します。投稿するアプリに悪意のあるコードや著作権侵害コンテンツが含まれていないことを確認しました。
+                  </span>
+                </label>
+                <p class="form-error hidden" id="agree-error">利用規約への同意が必要です</p>
+              </div>
+            </div>
+
+            <!-- 送信ボタン -->
+            <div style="text-align:right;display:flex;gap:12px;justify-content:flex-end;align-items:center;">
+              <a href="mypage.html" class="btn btn--ghost">キャンセル</a>
+              <button type="submit" id="submit-btn" class="btn btn--primary btn--lg">
+                <i class="fa fa-paper-plane"></i>
+                <span id="submit-btn-text">投稿する</span>
+              </button>
+            </div>
+
+          </div>
+        </form>
+      </div><!-- /フォームカラム -->
+
+      <!-- ===== サイドバー ===== -->
+      <aside class="submit-sidebar" aria-label="投稿のヒント">
+        <div class="hint-card">
+          <h3>📝 投稿のコツ</h3>
+          <ul>
+            <li><span>✅</span>タイトルは具体的に（「学級通信テンプレジェネレーター」など）</li>
+            <li><span>✅</span>どんな場面で役立つかを概要に書くと閲覧数アップ</li>
+            <li><span>✅</span>プロンプトを公開すると「いいね」が増えやすい</li>
+            <li><span>✅</span>サムネイル画像があると目立つ</li>
+          </ul>
+        </div>
+        <div class="hint-card">
+          <h3>📦 HTMLファイル型のすすめ</h3>
+          <ul>
+            <li><span>🔒</span>学校のネット制限内でも使える</li>
+            <li><span>🛡️</span>個人情報が外部に出ない安心感</li>
+            <li><span>⚡</span>ダウンロードしたらすぐ使える</li>
+            <li><span>✏️</span>中身を自分でカスタマイズできる</li>
+          </ul>
+        </div>
+        <div class="hint-card" style="background:#FBF0CE;border-color:var(--mustard);">
+          <h3>⚠️ 禁止事項</h3>
+          <ul>
+            <li><span>🚫</span>悪意のあるコードの含まれるファイル</li>
+            <li><span>🚫</span>他者の著作物の無断転載</li>
+            <li><span>🚫</span>個人情報・機密情報の含まれるコンテンツ</li>
+            <li><span>🚫</span>教育と関係のないコンテンツ</li>
+          </ul>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</main>
+
+<!-- フッター -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom" style="margin-top:0;border-top:none;">
+      <p>© 2026 先生アプリ. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container" aria-live="polite"></div>
+
+<script type="module">
+  import { auth, submitApp, updateApp, getApp, loginWithGoogle, logout, onAuthStateChanged }
+    from "./js/firebase.js";
+
+  function showToast(msg, type="default") {
+    const c = document.getElementById("toast-container");
+    const icons = {success:"✅",error:"❌",warning:"⚠️",default:"📢"};
+    const t = document.createElement("div");
+    t.className = `toast toast--${type}`;
+    t.innerHTML = `<span>${icons[type]||icons.default}</span><span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+
+  const params = new URLSearchParams(location.search);
+  const editId = params.get("edit"); // 編集モードのアプリID
+  let selectedHtmlFile = null;
+
+  // ========== 認証チェック ==========
+  onAuthStateChanged(auth, async (user) => {
+    setupHeader(user);
+    if (!user) {
+      document.getElementById("login-required").classList.remove("hidden");
+      document.getElementById("submit-main").classList.add("hidden");
+      return;
+    }
+    document.getElementById("login-required").classList.remove("hidden");
+    document.getElementById("submit-main").classList.remove("hidden");
+    document.getElementById("login-required").classList.add("hidden");
+
+    // 編集モード：既存データをフォームに埋める
+    if (editId) {
+      document.getElementById("page-title").textContent = "アプリを編集する";
+      document.querySelector(".page-hero h1").textContent = "アプリを編集する";
+      document.getElementById("submit-btn-text").textContent = "更新する";
+      await loadExistingApp(editId, user.uid);
+    }
+  });
+
+  async function loadExistingApp(appId, uid) {
+    try {
+      const app = await getApp(appId);
+      if (!app || app.authorUid !== uid) {
+        showToast("このアプリを編集する権限がありません", "error");
+        setTimeout(() => location.href = "mypage.html", 1500);
+        return;
+      }
+      // フォームに値をセット
+      document.getElementById("field-title").value       = app.title || "";
+      document.getElementById("field-description").value = app.description || "";
+      document.getElementById("field-howto").value       = app.howto || "";
+      document.getElementById("field-prompt").value      = app.prompt || "";
+      document.getElementById("field-thumbnail").value   = app.thumbnailUrl || "";
+      if (app.aiTool) document.getElementById("field-ai-tool").value = app.aiTool;
+
+      (app.tags || []).forEach(t => {
+        const cb = document.querySelector(`input[name="tags"][value="${t}"]`);
+        if (cb) cb.checked = true;
+      });
+
+      const shareType = app.shareType || "link";
+      document.getElementById(shareType === "html" ? "type-html" : "type-link").checked = true;
+      updateShareTypeUI(shareType);
+
+      if (app.appUrl) document.getElementById("field-app-url").value = app.appUrl;
+      if (app.htmlFileUrl) {
+        document.getElementById("selected-file-name").textContent = "既存のHTMLファイルが設定されています（変更する場合は新しいファイルを選択）";
+        document.getElementById("selected-file-name").classList.remove("hidden");
+      }
+      // オフライン動作フラグを復元
+      if (app.offlineSupport) {
+        document.getElementById("field-offline").checked = true;
+        document.getElementById("offline-preview").classList.remove("hidden");
+        document.getElementById("offline-check-label").style.borderColor = "var(--moss)";
+        document.getElementById("offline-check-label").style.background = "#E8F0E4";
+      }
+      updateDescCount();
+    } catch (e) {
+      console.error(e);
+      showToast("データの読み込みに失敗しました", "error");
+    }
+  }
+
+  // ========== 共有タイプ切り替え ==========
+  function updateShareTypeUI(type) {
+    document.getElementById("link-section").classList.toggle("hidden", type !== "link");
+    document.getElementById("html-section").classList.toggle("hidden", type !== "html");
+    document.getElementById("field-app-url").required = type === "link";
+  }
+
+  document.querySelectorAll('input[name="shareType"]').forEach(radio => {
+    radio.addEventListener("change", () => updateShareTypeUI(radio.value));
+  });
+
+  // ========== オフライン動作チェックボックス ==========
+  document.getElementById("field-offline").addEventListener("change", function() {
+    const label   = document.getElementById("offline-check-label");
+    const preview = document.getElementById("offline-preview");
+    if (this.checked) {
+      label.style.borderColor = "var(--moss)";
+      label.style.background  = "#E8F0E4";
+      preview.classList.remove("hidden");
+    } else {
+      label.style.borderColor = "";
+      label.style.background  = "";
+      preview.classList.add("hidden");
+    }
+  });
+
+  // ========== 文字数カウント ==========
+  function updateDescCount() {
+    document.getElementById("desc-count").textContent =
+      document.getElementById("field-description").value.length;
+  }
+  document.getElementById("field-description").addEventListener("input", updateDescCount);
+
+  // ========== ファイルドロップ ==========
+  const dropArea  = document.getElementById("file-drop-area");
+  const fileInput = document.getElementById("html-file-input");
+
+  dropArea.addEventListener("click", () => fileInput.click());
+  dropArea.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") fileInput.click(); });
+
+  ["dragenter","dragover"].forEach(evt => {
+    dropArea.addEventListener(evt, e => { e.preventDefault(); dropArea.classList.add("drag-over"); });
+  });
+  ["dragleave","drop"].forEach(evt => {
+    dropArea.addEventListener(evt, e => { e.preventDefault(); dropArea.classList.remove("drag-over"); });
+  });
+  dropArea.addEventListener("drop", e => {
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileSelect(file);
+  });
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files[0]) handleFileSelect(fileInput.files[0]);
+  });
+
+  function handleFileSelect(file) {
+    if (!file.name.match(/\.(html|htm)$/i)) {
+      showToast(".html または .htm ファイルのみアップロードできます", "error");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast("ファイルサイズが5MBを超えています", "error");
+      return;
+    }
+    selectedHtmlFile = file;
+    const nameEl = document.getElementById("selected-file-name");
+    nameEl.textContent = `✅ 選択中: ${file.name} (${(file.size/1024).toFixed(1)}KB)`;
+    nameEl.classList.remove("hidden");
+  }
+
+  // ========== フォームバリデーション ==========
+  function validateForm() {
+    let valid = true;
+    const clearErrors = () => {
+      document.querySelectorAll(".form-error").forEach(e => e.classList.add("hidden"));
+    };
+    clearErrors();
+
+    const title = document.getElementById("field-title").value.trim();
+    if (!title) {
+      showFieldError("field-title", "タイトルを入力してください");
+      valid = false;
+    }
+
+    const desc = document.getElementById("field-description").value.trim();
+    if (!desc) {
+      showFieldError("field-description", "概要を入力してください");
+      valid = false;
+    }
+
+    const tags = [...document.querySelectorAll('input[name="tags"]:checked')].map(c => c.value);
+    if (!tags.length) {
+      document.getElementById("tags-error").classList.remove("hidden");
+      valid = false;
+    }
+
+    const shareType = document.querySelector('input[name="shareType"]:checked')?.value;
+    if (shareType === "link") {
+      const url = document.getElementById("field-app-url").value.trim();
+      if (!url || !url.startsWith("http")) {
+        document.getElementById("url-error").classList.remove("hidden");
+        valid = false;
+      }
+    } else if (shareType === "html") {
+      if (!selectedHtmlFile && !editId) {
+        document.getElementById("file-error").classList.remove("hidden");
+        valid = false;
+      }
+    }
+
+    if (!document.getElementById("agree-terms").checked) {
+      document.getElementById("agree-error").classList.remove("hidden");
+      valid = false;
+    }
+
+    return { valid, tags, shareType };
+  }
+
+  function showFieldError(fieldId, msg) {
+    const field = document.getElementById(fieldId);
+    const err   = document.createElement("p");
+    err.className = "form-error";
+    err.textContent = msg;
+    field.after(err);
+    field.style.borderColor = "var(--salmon)";
+  }
+
+  // ========== フォーム送信 ==========
+  document.getElementById("submit-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) { showToast("ログインが必要です", "error"); return; }
+
+    const { valid, tags, shareType } = validateForm();
+    if (!valid) {
+      showToast("入力内容に不備があります", "error");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const btn = document.getElementById("submit-btn");
+    btn.disabled = true;
+    btn.innerHTML = `<span class="loading-spinner" style="width:20px;height:20px;border-width:2px;"></span> 投稿中...`;
+
+    const data = {
+      title:          document.getElementById("field-title").value.trim(),
+      description:    document.getElementById("field-description").value.trim(),
+      howto:          document.getElementById("field-howto").value.trim(),
+      prompt:         document.getElementById("field-prompt").value.trim(),
+      thumbnailUrl:   document.getElementById("field-thumbnail").value.trim() || null,
+      aiTool:         document.getElementById("field-ai-tool").value || null,
+      appUrl:         shareType === "link" ? document.getElementById("field-app-url").value.trim() : null,
+      offlineSupport: document.getElementById("field-offline").checked,
+      tags,
+      shareType
+    };
+
+    try {
+      if (editId) {
+        await updateApp(editId, data, selectedHtmlFile);
+        showToast("アプリを更新しました！", "success");
+        setTimeout(() => location.href = `app-detail.html?id=${editId}`, 1500);
+      } else {
+        const newId = await submitApp(data, selectedHtmlFile);
+        showToast("アプリを投稿しました！🎉", "success");
+        setTimeout(() => location.href = `app-detail.html?id=${newId}`, 1500);
+      }
+    } catch (err) {
+      console.error(err);
+      showToast(`投稿に失敗しました: ${err.message}`, "error");
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa fa-paper-plane"></i> <span id="submit-btn-text">${editId ? "更新する" : "投稿する"}</span>`;
+    }
+  });
+
+  // ========== ヘッダー ==========
+  function setupHeader(user) {
+    const loginBtn = document.getElementById("login-btn");
+    const menuBtn  = document.getElementById("user-menu-btn");
+    const avatar   = document.getElementById("user-avatar");
+    const nameEl   = document.getElementById("user-name-display");
+
+    if (user) {
+      loginBtn?.classList.add("hidden");
+      menuBtn?.classList.remove("hidden");
+      if (avatar) avatar.innerHTML = user.photoURL
+        ? `<img src="${user.photoURL}" alt="">` : (user.displayName||"先")[0];
+      if (nameEl) nameEl.textContent = user.displayName || "先生";
+    } else {
+      loginBtn?.classList.remove("hidden");
+      menuBtn?.classList.add("hidden");
+    }
+    loginBtn?.addEventListener("click", async () => {
+      try { await loginWithGoogle(); }
+      catch { showToast("ログインに失敗しました", "error"); }
+    });
+    document.getElementById("logout-btn")?.addEventListener("click", async () => {
+      await logout(); location.href = "/";
+    });
+    document.getElementById("user-menu-btn")?.addEventListener("click", e => {
+      e.stopPropagation();
+      document.getElementById("dropdown-menu")?.classList.toggle("open");
+    });
+    document.addEventListener("click", () => {
+      document.getElementById("dropdown-menu")?.classList.remove("open");
+    });
+  }
+
+  document.getElementById("login-required-btn")?.addEventListener("click", async () => {
+    try {
+      await loginWithGoogle();
+    } catch { showToast("ログインに失敗しました", "error"); }
+  });
+
+  document.getElementById("hamburger-btn")?.addEventListener("click", () => {
+    document.getElementById("mobile-menu").classList.toggle("open");
+  });
+</script>
+</body>
+</html>

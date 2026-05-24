@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="先生たちがAIで自作したWebアプリを共有するプラットフォーム。校務支援・学級経営・授業教材のツールを探したり、自作アプリをシェアしよう。">
+  <title>先生アプリ ― AIで作った先生のためのアプリ共有サイト</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
+
+  <!-- スタイル -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/index.css">
+
+  <!-- OGP -->
+  <meta property="og:title"       content="先生アプリ">
+  <meta property="og:description" content="先生たちがAIで自作したWebアプリを共有するプラットフォーム">
+  <meta property="og:type"        content="website">
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+
+<!-- =============================================
+     サイトヘッダー
+     ============================================= -->
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="site-logo" aria-label="先生アプリ ホーム">
+      <div class="site-logo__icon">🍀</div>
+      <div class="site-logo__text">先生<span>アプリ</span></div>
+    </a>
+
+    <nav class="site-nav" aria-label="メインナビゲーション">
+      <a href="/">ホーム</a>
+      <a href="apps.html">アプリ一覧</a>
+      <a href="about.html">このサイトについて</a>
+      <a href="terms.html">利用規約</a>
+    </nav>
+
+    <div class="header-actions">
+      <!-- 未ログイン -->
+      <button id="login-btn" class="btn btn--primary btn--sm" aria-label="Googleでログイン">
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        ログイン
+      </button>
+
+      <!-- ログイン済み -->
+      <a href="submit.html" id="post-btn" class="btn btn--mustard btn--sm hidden" aria-label="アプリを投稿する">
+        ＋ 投稿する
+      </a>
+
+      <div class="dropdown" id="user-dropdown">
+        <button id="user-menu-btn" class="user-avatar hidden" aria-label="ユーザーメニュー" data-dropdown-trigger>
+          <span id="user-avatar">👤</span>
+        </button>
+        <div class="dropdown-menu" id="dropdown-menu" role="menu">
+          <span id="user-name-display" style="padding:10px 16px;font-size:0.82rem;color:var(--text-sub);display:block;border-bottom:1px solid var(--border);">読み込み中...</span>
+          <a href="mypage.html" role="menuitem"><i class="fa fa-house" aria-hidden="true"></i> マイページ</a>
+          <a href="submit.html" role="menuitem"><i class="fa fa-plus-circle" aria-hidden="true"></i> アプリを投稿</a>
+          <a href="admin.html" id="admin-link" class="hidden" role="menuitem"><i class="fa fa-shield-halved" aria-hidden="true"></i> 管理者画面</a>
+          <hr>
+          <button id="logout-btn" role="menuitem"><i class="fa fa-right-from-bracket" aria-hidden="true"></i> ログアウト</button>
+        </div>
+      </div>
+
+      <!-- ハンバーガー -->
+      <button class="hamburger" id="hamburger-btn" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- モバイルメニュー -->
+  <div class="mobile-menu" id="mobile-menu" role="navigation" aria-label="モバイルメニュー">
+    <a href="/"><i class="fa fa-home"></i> ホーム</a>
+    <a href="apps.html"><i class="fa fa-grid-2"></i> アプリ一覧</a>
+    <a href="submit.html" id="mobile-post-btn"><i class="fa fa-plus-circle"></i> アプリを投稿</a>
+    <a href="mypage.html"><i class="fa fa-user"></i> マイページ</a>
+    <a href="about.html"><i class="fa fa-circle-info"></i> このサイトについて</a>
+    <a href="terms.html"><i class="fa fa-file-lines"></i> 利用規約</a>
+  </div>
+</header>
+
+<!-- =============================================
+     ヒーローセクション
+     ============================================= -->
+<section class="hero" aria-labelledby="hero-heading">
+  <div class="container">
+    <div class="hero__inner">
+      <div class="hero__content">
+        <p class="hero__eyebrow">👩‍🏫 先生による・先生のための</p>
+        <h1 id="hero-heading" class="hero__title">
+          AIで作った<br>アプリを<br><em>みんなで使おう</em>
+        </h1>
+        <p class="hero__desc">
+          Geminiなどの生成AIで先生が自作したWebアプリを共有するプラットフォーム。<br>
+          プロンプト・ソースコードも公開。学校のネット制限でも使える<strong>オフライン動作対応</strong>アプリも充実。
+        </p>
+        <div class="hero__badges">
+          <span class="hero-badge"><i class="fa fa-shield-halved"></i> 個人情報ゼロ</span>
+          <span class="hero-badge"><i class="fa fa-wifi-slash"></i> オフライン対応</span>
+          <span class="hero-badge"><i class="fa fa-download"></i> インストール不要</span>
+          <span class="hero-badge"><i class="fa fa-robot"></i> AIプロンプト公開</span>
+        </div>
+        <div class="hero__cta">
+          <a href="apps.html" class="btn btn--mustard btn--lg">
+            <i class="fa fa-magnifying-glass"></i> アプリを探す
+          </a>
+          <a href="submit.html" class="btn btn--lg" style="background:rgba(255,255,255,0.15);color:#fff;border:2px solid rgba(255,255,255,0.6);backdrop-filter:blur(4px);">
+            <i class="fa fa-plus"></i> 投稿する
+          </a>
+        </div>
+      </div>
+      <div class="hero__visual" aria-hidden="true">
+        <div class="hero__board">
+          <div class="hero__board-header">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="hero__board-body">
+            <div class="hero__app-preview">
+              <div class="preview-card preview-card--1">
+                <span class="preview-card__icon">📋</span>
+                <span>所見文章ジェネレーター</span>
+                <span class="badge badge--green">📦 ローカル</span>
+              </div>
+              <div class="preview-card preview-card--2">
+                <span class="preview-card__icon">📊</span>
+                <span>座席表メーカー</span>
+                <span class="badge badge--gray">🔗 リンク</span>
+              </div>
+              <div class="preview-card preview-card--3">
+                <span class="preview-card__icon">✅</span>
+                <span>配布物チェックリスト</span>
+                <span class="badge badge--green">📦 ローカル</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     お知らせバナー
+     ============================================= -->
+<div id="notice-bar" class="notice-bar hidden" role="region" aria-label="お知らせ">
+  <div class="container">
+    <div id="notice-list"></div>
+  </div>
+</div>
+
+<!-- =============================================
+     カテゴリタグ絞り込み
+     ============================================= -->
+<section class="section section--tags" aria-labelledby="tags-heading" id="main-content">
+  <div class="container">
+    <h2 id="tags-heading" class="visually-hidden">カテゴリで絞り込む</h2>
+    <div class="tags-scroll" role="list" aria-label="カテゴリタグ">
+      <button class="tag active" data-tag="" data-offline="" role="listitem">🍀 すべて</button>
+      <button class="tag tag--offline" data-tag="" data-offline="1" role="listitem">
+        📴 オフライン動作のみ
+      </button>
+      <span class="tag-divider" aria-hidden="true" style="width:1px;background:var(--border);flex-shrink:0;margin:0 4px;"></span>
+      <button class="tag" data-tag="校務支援"    data-offline="" role="listitem">📋 校務支援</button>
+      <button class="tag" data-tag="学級経営"    data-offline="" role="listitem">🏫 学級経営</button>
+      <button class="tag" data-tag="授業・教材"  data-offline="" role="listitem">📚 授業・教材</button>
+      <button class="tag" data-tag="評価・採点"  data-offline="" role="listitem">✅ 評価・採点</button>
+      <button class="tag" data-tag="保護者連絡"  data-offline="" role="listitem">📨 保護者連絡</button>
+      <button class="tag" data-tag="特別支援"    data-offline="" role="listitem">🤝 特別支援</button>
+      <button class="tag" data-tag="ICT活用"     data-offline="" role="listitem">💻 ICT活用</button>
+      <button class="tag" data-tag="部活・行事"  data-offline="" role="listitem">🎉 部活・行事</button>
+      <button class="tag" data-tag="その他"      data-offline="" role="listitem">🌟 その他</button>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     ピックアップアプリ
+     ============================================= -->
+<section class="section section--pickup" id="pickup-section" aria-labelledby="pickup-heading">
+  <div class="container">
+    <div class="flex-between mb-24">
+      <div>
+        <h2 class="section-title" id="pickup-heading">今週のピックアップ</h2>
+        <p class="section-subtitle">管理者おすすめの厳選アプリ</p>
+      </div>
+    </div>
+    <div class="apps-grid" id="pickup-grid" aria-live="polite">
+      <!-- JS で挿入 -->
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     メインアプリ一覧
+     ============================================= -->
+<section class="section section--apps" aria-labelledby="apps-heading">
+  <div class="container">
+    <div class="apps-header flex-between mb-24" style="flex-wrap:wrap;gap:16px;">
+      <div>
+        <h2 class="section-title" id="apps-heading">
+          <span id="apps-heading-label">新着アプリ</span>
+        </h2>
+        <p class="section-subtitle" id="apps-count-label">読み込み中...</p>
+      </div>
+      <div class="apps-sort">
+        <label for="sort-select" class="visually-hidden">並び替え</label>
+        <select class="form-select" id="sort-select" style="width:auto;padding:8px 14px;" aria-label="並び替え">
+          <option value="createdAt">新着順</option>
+          <option value="popular">人気順</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 検索バー -->
+    <div class="search-bar mb-32" role="search">
+      <div class="search-bar__inner">
+        <i class="fa fa-magnifying-glass search-bar__icon" aria-hidden="true"></i>
+        <input type="search" id="search-input" class="form-input search-bar__input"
+               placeholder="アプリ名・説明で検索..." aria-label="アプリを検索">
+        <button id="search-btn" class="btn btn--primary btn--sm" aria-label="検索する">検索</button>
+      </div>
+    </div>
+
+    <div class="apps-grid" id="apps-grid" aria-live="polite" aria-busy="true">
+      <!-- スケルトン -->
+    </div>
+
+    <div class="pagination" id="pagination" role="navigation" aria-label="ページネーション"></div>
+
+    <div id="apps-empty" class="apps-empty hidden" role="status">
+      <span class="apps-empty__icon">🔍</span>
+      <p>アプリが見つかりませんでした。</p>
+      <p class="text-sub">別のキーワードやカテゴリでお試しください。</p>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     使い方・特徴セクション
+     ============================================= -->
+<section class="section section--howto" aria-labelledby="howto-heading">
+  <div class="container container--narrow">
+    <h2 class="section-title text-center" id="howto-heading" style="justify-content:center;">このサイトの使い方</h2>
+    <p class="section-subtitle text-center" style="margin-bottom:40px;">簡単3ステップで先生の知恵を共有</p>
+    <div class="howto-steps">
+      <article class="howto-step">
+        <div class="howto-step__num" aria-hidden="true">01</div>
+        <div class="howto-step__icon">🔍</div>
+        <h3>アプリを探す</h3>
+        <p>カテゴリタグや検索で、自分の現場に合ったアプリを探しましょう。</p>
+      </article>
+      <div class="howto-arrow" aria-hidden="true">→</div>
+      <article class="howto-step">
+        <div class="howto-step__num" aria-hidden="true">02</div>
+        <div class="howto-step__icon">📥</div>
+        <h3>使ってみる</h3>
+        <p>URLで直接アクセス、またはHTMLファイルをダウンロードしてオフラインで使用。</p>
+      </article>
+      <div class="howto-arrow" aria-hidden="true">→</div>
+      <article class="howto-step">
+        <div class="howto-step__num" aria-hidden="true">03</div>
+        <div class="howto-step__icon">🚀</div>
+        <h3>作って投稿</h3>
+        <p>AIで作った自分のアプリをシェア。プロンプトも公開して先生仲間に貢献。</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     安心バッジセクション
+     ============================================= -->
+<section class="section section--trust" aria-labelledby="trust-heading">
+  <div class="container">
+    <h2 class="section-title text-center" id="trust-heading" style="justify-content:center;">学校現場の安心・安全を重視</h2>
+    <p class="section-subtitle text-center" style="margin-bottom:40px;">厳しいネットワーク環境でも安心して使えます</p>
+    <div class="trust-grid">
+      <article class="trust-card">
+        <div class="trust-card__icon">📴</div>
+        <h3>オフライン動作対応アプリも充実</h3>
+        <p>投稿者が「オフライン動作対応」を選択したアプリにはバッジを表示。学校のネット制限環境でも安心して使えます。</p>
+      </article>
+      <article class="trust-card">
+        <div class="trust-card__icon">🔒</div>
+        <h3>個人情報は端末内（ローカル型）</h3>
+        <p>HTMLファイル型のアプリは外部サーバーと通信しません。児童生徒のデータが外部に漏れるリスクがありません。</p>
+      </article>
+      <article class="trust-card">
+        <div class="trust-card__icon">🤖</div>
+        <h3>プロンプト公開</h3>
+        <p>アプリを作ったAIへの「呪文（プロンプト）」も公開。先生自身がカスタマイズして使える。</p>
+      </article>
+      <article class="trust-card">
+        <div class="trust-card__icon">👩‍🏫</div>
+        <h3>現場の先生が作る</h3>
+        <p>実際の教育現場を知る先生が、自分の困りごとを解決するために作ったツール。</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     CTAセクション
+     ============================================= -->
+<section class="section section--cta" aria-labelledby="cta-heading">
+  <div class="container">
+    <div class="cta-box">
+      <div class="cta-box__deco" aria-hidden="true">🍀</div>
+      <h2 id="cta-heading">あなたのアプリも<br>共有しませんか？</h2>
+      <p>AIで作ったアプリを投稿するだけ。全国の先生の役に立てます。</p>
+      <a href="submit.html" class="btn btn--mustard btn--lg">
+        <i class="fa fa-plus-circle"></i> アプリを投稿する
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     フッター
+     ============================================= -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="site-logo">
+          <div class="site-logo__icon" style="background:rgba(255,255,255,0.2);">🍀</div>
+          <div class="site-logo__text">先生<span style="color:var(--salmon);">アプリ</span></div>
+        </a>
+        <p>先生たちがAIで自作したWebアプリを共有するプラットフォーム。学校現場の課題を、みんなの知恵で解決しよう。</p>
+      </div>
+      <div class="footer-col">
+        <h4>サイトメニュー</h4>
+        <ul>
+          <li><a href="/">ホーム</a></li>
+          <li><a href="apps.html">アプリ一覧</a></li>
+          <li><a href="submit.html">アプリを投稿</a></li>
+          <li><a href="mypage.html">マイページ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>カテゴリ</h4>
+        <ul>
+          <li><a href="apps.html?tag=校務支援">校務支援</a></li>
+          <li><a href="apps.html?tag=学級経営">学級経営</a></li>
+          <li><a href="apps.html?tag=授業・教材">授業・教材</a></li>
+          <li><a href="apps.html?tag=評価・採点">評価・採点</a></li>
+          <li><a href="apps.html?tag=特別支援">特別支援</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>法的情報</h4>
+        <ul>
+          <li><a href="terms.html">利用規約</a></li>
+          <li><a href="privacy.html">プライバシーポリシー</a></li>
+          <li><a href="about.html">このサイトについて</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 先生アプリ. All rights reserved.</p>
+      <p class="text-light" style="font-size:0.78rem;">学校のセキュリティ規定の遵守は、利用される先生ご自身の責任においてご判断ください。</p>
+    </div>
+  </div>
+</footer>
+
+<!-- トースト通知コンテナ -->
+<div id="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+<!-- =============================================
+     スクリプト
+     ============================================= -->
+<script type="module">
+  import { loginWithGoogle, logout, getApps, getPickupApps, getNotices, onAuthStateChanged, auth }
+    from "./js/firebase.js";
+
+  // UI ユーティリティ読み込み
+  const uiScript = document.createElement('script');
+  uiScript.src = './js/ui.js';
+  uiScript.type = 'module';
+  document.head.appendChild(uiScript);
+
+  // ========== 状態 ==========
+  let currentTag     = "";
+  let currentSort    = "createdAt";
+  let currentPage    = 1;
+  let lastDocStack   = [null]; // ページングスタック
+  let currentOffline = false;  // オフラインフィルター中かどうか
+  const PAGE_SIZE    = 12;
+
+  // ========== UI初期化 ==========
+  function escHtml(s) {
+    return String(s ?? "").replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function formatDate(ts) {
+    if (!ts) return "";
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString("ja-JP", { year:"numeric", month:"short", day:"numeric" });
+  }
+
+  function getAppEmoji(tags = []) {
+    const map = {"校務支援":"📋","学級経営":"🏫","授業・教材":"📚","評価・採点":"✅","保護者連絡":"📨","特別支援":"🤝","ICT活用":"💻","部活・行事":"🎉","その他":"🌟"};
+    for (const t of tags) if (map[t]) return map[t];
+    return "🍀";
+  }
+
+  function createSkeletons(n) {
+    return Array.from({length:n}, () => `
+      <div class="card app-card app-card--skeleton" aria-hidden="true">
+        <div class="app-card__thumb skeleton" style="height:160px;"></div>
+        <div class="app-card__body">
+          <div class="skeleton" style="height:16px;width:55%;border-radius:6px;margin-bottom:8px;"></div>
+          <div class="skeleton" style="height:22px;width:90%;border-radius:6px;margin-bottom:10px;"></div>
+          <div class="skeleton" style="height:13px;border-radius:6px;margin-bottom:4px;"></div>
+          <div class="skeleton" style="height:13px;width:65%;border-radius:6px;"></div>
+        </div>
+      </div>`).join("");
+  }
+
+  function renderAppCard(app) {
+    const tags = (app.tags || []).slice(0, 2).map(t =>
+      `<span class="badge badge--moss">${escHtml(t)}</span>`).join("");
+    const typeBadge = app.shareType === "html"
+      ? `<span class="badge badge--green" title="HTMLファイルをダウンロードしてオフラインで使用">📦 HTML型</span>`
+      : `<span class="badge badge--gray" title="外部サイトへのリンク">🔗 リンク</span>`;
+    // オフライン動作バッジ（設定されている場合のみ表示）
+    const offlineBadge = app.offlineSupport
+      ? `<span class="badge badge--offline" title="インターネット不要で動作します">📴 オフライン動作対応</span>`
+      : "";
+    const thumb = app.thumbnailUrl
+      ? `<img src="${escHtml(app.thumbnailUrl)}" alt="${escHtml(app.title)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`
+      : `<div class="app-card__thumb-placeholder" aria-hidden="true">${getAppEmoji(app.tags || [])}</div>`;
+
+    return `
+      <article class="card app-card" role="listitem">
+        <a href="app-detail.html?id=${escHtml(app.id)}" class="app-card__thumb" aria-label="${escHtml(app.title)} の詳細を見る">
+          ${thumb}
+          <div class="app-card__type">${typeBadge}</div>
+        </a>
+        <div class="app-card__body">
+          <div class="app-card__tags" aria-label="カテゴリ">${tags}${offlineBadge}</div>
+          <h3 class="app-card__title">
+            <a href="app-detail.html?id=${escHtml(app.id)}">${escHtml(app.title)}</a>
+          </h3>
+          <p class="app-card__desc">${escHtml((app.description||"").slice(0,80))}${(app.description||"").length>80?"…":""}</p>
+          <footer class="app-card__footer">
+            <span class="app-card__author">
+              ${app.authorPhoto
+                ? `<img src="${escHtml(app.authorPhoto)}" alt="" class="app-card__author-icon" aria-hidden="true">`
+                : `<span class="app-card__author-icon app-card__author-icon--default" aria-hidden="true">${escHtml((app.authorName||"先")[0])}</span>`}
+              ${escHtml(app.authorName || "先生")}
+            </span>
+            <span class="app-card__stats" aria-label="いいね${app.likeCount||0}、閲覧${app.viewCount||0}">
+              ❤️ ${app.likeCount||0} &nbsp; 👁 ${app.viewCount||0}
+            </span>
+          </footer>
+        </div>
+      </article>`;
+  }
+
+  // ========== ピックアップ読み込み ==========
+  async function loadPickup() {
+    const grid = document.getElementById("pickup-grid");
+    grid.innerHTML = createSkeletons(3);
+    try {
+      const apps = await getPickupApps();
+      if (!apps.length) {
+        document.getElementById("pickup-section").classList.add("hidden");
+        return;
+      }
+      grid.innerHTML = apps.map(renderAppCard).join("");
+    } catch {
+      document.getElementById("pickup-section").classList.add("hidden");
+    }
+  }
+
+  // ========== アプリ一覧読み込み ==========
+  async function loadApps(reset = false) {
+    if (reset) { currentPage = 1; lastDocStack = [null]; }
+    const grid    = document.getElementById("apps-grid");
+    const empty   = document.getElementById("apps-empty");
+    const countLb = document.getElementById("apps-count-label");
+
+    grid.setAttribute("aria-busy", "true");
+    grid.innerHTML = createSkeletons(PAGE_SIZE);
+    empty.classList.add("hidden");
+
+    try {
+      const opts = {
+        tags:        currentOffline ? [] : (currentTag ? [currentTag] : []),
+        sort:        currentSort,
+        pageSize:    PAGE_SIZE,
+        lastDoc:     lastDocStack[currentPage - 1],
+        offlineOnly: currentOffline
+      };
+      const { docs, lastDoc } = await getApps(opts);
+
+      // 次ページ用の lastDoc を保存
+      if (docs.length === PAGE_SIZE) lastDocStack[currentPage] = lastDoc;
+
+      if (!docs.length && currentPage === 1) {
+        grid.innerHTML = "";
+        empty.classList.remove("hidden");
+        countLb.textContent = "0件";
+        renderPagination(false, false);
+        return;
+      }
+
+      grid.innerHTML = docs.map(renderAppCard).join("");
+      grid.setAttribute("aria-busy", "false");
+      countLb.textContent = `${docs.length}件表示中 (${currentPage}ページ目)`;
+      renderPagination(currentPage > 1, docs.length === PAGE_SIZE);
+    } catch (e) {
+      console.error(e);
+      grid.innerHTML = `<p class="text-sub" style="padding:24px 0;">読み込みに失敗しました。ページを再読み込みしてください。</p>`;
+    }
+  }
+
+  // ========== ページネーション ==========
+  function renderPagination(hasPrev, hasNext) {
+    const container = document.getElementById("pagination");
+    container.innerHTML = "";
+
+    if (!hasPrev && !hasNext) return;
+
+    if (hasPrev) {
+      const btn = document.createElement("button");
+      btn.textContent = "← 前へ";
+      btn.setAttribute("aria-label", "前のページ");
+      btn.onclick = () => { currentPage--; loadApps(); window.scrollTo(0,600); };
+      container.appendChild(btn);
+    }
+    const pageSpan = document.createElement("button");
+    pageSpan.textContent = currentPage;
+    pageSpan.classList.add("active");
+    pageSpan.setAttribute("aria-current", "page");
+    container.appendChild(pageSpan);
+
+    if (hasNext) {
+      const btn = document.createElement("button");
+      btn.textContent = "次へ →";
+      btn.setAttribute("aria-label", "次のページ");
+      btn.onclick = () => { currentPage++; loadApps(); window.scrollTo(0,600); };
+      container.appendChild(btn);
+    }
+  }
+
+  // ========== お知らせ ==========
+  async function loadNotices() {
+    try {
+      const notices = await getNotices();
+      if (!notices.length) return;
+      const bar  = document.getElementById("notice-bar");
+      const list = document.getElementById("notice-list");
+      bar.classList.remove("hidden");
+      list.innerHTML = notices.map(n => `
+        <div class="notice-item">
+          <span class="badge badge--mustard">📢 お知らせ</span>
+          <span>${escHtml(n.body)}</span>
+          <span class="text-light">${formatDate(n.createdAt)}</span>
+        </div>`).join("");
+    } catch { /* お知らせはエラーでも無視 */ }
+  }
+
+  // ========== タグ・オフライン絞り込み ==========
+  document.querySelectorAll(".tag").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tag").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentTag     = btn.dataset.tag || "";
+      currentOffline = btn.dataset.offline === "1";
+      const label = document.getElementById("apps-heading-label");
+      if (currentOffline) {
+        label.textContent = "📴 オフライン動作対応アプリ";
+      } else {
+        label.textContent = currentTag ? `「${currentTag}」のアプリ` : "新着アプリ";
+      }
+      loadApps(true);
+    });
+  });
+
+  // ========== 並び替え ==========
+  document.getElementById("sort-select").addEventListener("change", e => {
+    currentSort = e.target.value;
+    loadApps(true);
+  });
+
+  // ========== 検索 ==========
+  // 注: Firestoreの全文検索は標準非対応のため、タイトル前方一致で簡易実装
+  // 本格運用にはAlgolia等を推奨
+  document.getElementById("search-btn").addEventListener("click", () => {
+    const val = document.getElementById("search-input").value.trim();
+    if (val) {
+      window.location.href = `apps.html?search=${encodeURIComponent(val)}`;
+    }
+  });
+  document.getElementById("search-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") document.getElementById("search-btn").click();
+  });
+
+  // ========== 認証ヘッダー ==========
+  onAuthStateChanged(auth, async (user) => {
+    const loginBtn    = document.getElementById("login-btn");
+    const userMenuBtn = document.getElementById("user-menu-btn");
+    const postBtn     = document.getElementById("post-btn");
+    const userAvatar  = document.getElementById("user-avatar");
+    const userName    = document.getElementById("user-name-display");
+    const adminLink   = document.getElementById("admin-link");
+    const logoutBtn   = document.getElementById("logout-btn");
+
+    if (user) {
+      loginBtn?.classList.add("hidden");
+      userMenuBtn?.classList.remove("hidden");
+      postBtn?.classList.remove("hidden");
+      if (userAvatar) {
+        userAvatar.innerHTML = user.photoURL
+          ? `<img src="${user.photoURL}" alt="${escHtml(user.displayName||'')}">`
+          : escHtml((user.displayName||"先")[0]);
+      }
+      if (userName) userName.textContent = user.displayName || "先生";
+
+      // 管理者チェック
+      try {
+        const { getUserDoc } = await import("./js/firebase.js");
+        const uDoc = await getUserDoc(user.uid);
+        if (uDoc?.role === "admin") adminLink?.classList.remove("hidden");
+      } catch {}
+    } else {
+      loginBtn?.classList.remove("hidden");
+      userMenuBtn?.classList.add("hidden");
+      postBtn?.classList.add("hidden");
+    }
+
+    loginBtn?.addEventListener("click", async () => {
+      try {
+        loginBtn.disabled = true;
+        loginBtn.textContent = "ログイン中...";
+        await loginWithGoogle();
+      } catch {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = `<i class="fa fa-right-to-bracket"></i> ログイン`;
+      }
+    });
+
+    logoutBtn?.addEventListener("click", async () => {
+      await logout();
+      location.reload();
+    });
+  });
+
+  // ========== ハンバーガーメニュー ==========
+  const hamburger  = document.getElementById("hamburger-btn");
+  const mobileMenu = document.getElementById("mobile-menu");
+  hamburger?.addEventListener("click", () => {
+    mobileMenu.classList.toggle("open");
+    hamburger.setAttribute("aria-expanded", mobileMenu.classList.contains("open").toString());
+  });
+
+  // ========== ドロップダウン ==========
+  document.getElementById("user-menu-btn")?.addEventListener("click", e => {
+    e.stopPropagation();
+    document.getElementById("dropdown-menu")?.classList.toggle("open");
+  });
+  document.addEventListener("click", () => {
+    document.getElementById("dropdown-menu")?.classList.remove("open");
+  });
+
+  // ========== URLパラメータからタグを読む ==========
+  const urlParams = new URLSearchParams(location.search);
+  const urlTag = urlParams.get("tag");
+  if (urlTag) {
+    currentTag = urlTag;
+    document.querySelectorAll(".tag").forEach(b => {
+      b.classList.toggle("active", b.dataset.tag === urlTag);
+    });
+    document.getElementById("apps-heading-label").textContent = `「${urlTag}」のアプリ`;
+  }
+
+  // ========== 初期ロード ==========
+  loadPickup();
+  loadApps();
+  loadNotices();
+</script>
+
+</body>
+</html>

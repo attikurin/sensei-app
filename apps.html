@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アプリ一覧 - 先生アプリ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="site-logo">
+      <div class="site-logo__icon">🍀</div>
+      <div class="site-logo__text">先生<span>アプリ</span></div>
+    </a>
+    <nav class="site-nav">
+      <a href="/">ホーム</a>
+      <a href="apps.html" style="color:var(--moss);font-weight:700;">アプリ一覧</a>
+      <a href="about.html">このサイトについて</a>
+    </nav>
+    <div class="header-actions">
+      <button id="login-btn" class="btn btn--primary btn--sm"><i class="fa fa-right-to-bracket"></i> ログイン</button>
+      <a href="submit.html" id="post-btn" class="btn btn--mustard btn--sm hidden">＋ 投稿する</a>
+      <div class="dropdown">
+        <button id="user-menu-btn" class="user-avatar hidden" data-dropdown-trigger aria-label="ユーザーメニュー">
+          <span id="user-avatar">👤</span>
+        </button>
+        <div class="dropdown-menu" id="dropdown-menu">
+          <span id="user-name-display" style="padding:10px 16px;font-size:0.82rem;color:var(--text-sub);display:block;border-bottom:1px solid var(--border);"></span>
+          <a href="mypage.html"><i class="fa fa-house"></i> マイページ</a>
+          <a href="submit.html"><i class="fa fa-plus-circle"></i> アプリを投稿</a>
+          <a href="admin.html" id="admin-link" class="hidden"><i class="fa fa-shield-halved"></i> 管理者画面</a>
+          <hr>
+          <button id="logout-btn"><i class="fa fa-right-from-bracket"></i> ログアウト</button>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger-btn" aria-label="メニュー" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/"><i class="fa fa-home"></i> ホーム</a>
+    <a href="apps.html"><i class="fa fa-grid-2"></i> アプリ一覧</a>
+    <a href="submit.html"><i class="fa fa-plus-circle"></i> アプリを投稿</a>
+    <a href="mypage.html"><i class="fa fa-user"></i> マイページ</a>
+  </div>
+</header>
+
+<!-- ページヒーロー -->
+<div class="page-hero">
+  <div class="container">
+    <p class="page-hero__label">APP LIST</p>
+    <h1>アプリ一覧</h1>
+    <p>先生たちがAIで作ったアプリを探してみましょう。</p>
+  </div>
+</div>
+
+<!-- タグフィルター -->
+<section style="padding:20px 0;border-bottom:1.5px solid var(--border);" aria-label="カテゴリフィルター">
+  <div class="container">
+    <div class="tags-scroll" role="list">
+      <button class="tag active" data-tag="" data-offline="" role="listitem">🍀 すべて</button>
+      <button class="tag tag--offline" data-tag="" data-offline="1" role="listitem">📴 オフライン動作のみ</button>
+      <span class="tag-divider" role="separator" aria-hidden="true"
+            style="width:1.5px;height:20px;background:var(--border);display:inline-block;vertical-align:middle;margin:0 4px;"></span>
+      <button class="tag" data-tag="校務支援"   data-offline="" role="listitem">📋 校務支援</button>
+      <button class="tag" data-tag="学級経営"   data-offline="" role="listitem">🏫 学級経営</button>
+      <button class="tag" data-tag="授業・教材" data-offline="" role="listitem">📚 授業・教材</button>
+      <button class="tag" data-tag="評価・採点" data-offline="" role="listitem">✅ 評価・採点</button>
+      <button class="tag" data-tag="保護者連絡" data-offline="" role="listitem">📨 保護者連絡</button>
+      <button class="tag" data-tag="特別支援"   data-offline="" role="listitem">🤝 特別支援</button>
+      <button class="tag" data-tag="ICT活用"    data-offline="" role="listitem">💻 ICT活用</button>
+      <button class="tag" data-tag="部活・行事" data-offline="" role="listitem">🎉 部活・行事</button>
+      <button class="tag" data-tag="その他"     data-offline="" role="listitem">🌟 その他</button>
+    </div>
+  </div>
+</section>
+
+<main id="main-content">
+  <div class="container" style="padding-top:36px;padding-bottom:80px;">
+    <div class="apps-header flex-between mb-24" style="flex-wrap:wrap;gap:16px;">
+      <div>
+        <h2 class="section-title" id="apps-heading-label">すべてのアプリ</h2>
+        <p class="section-subtitle" id="apps-count-label">読み込み中...</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <label for="sort-select" style="font-size:0.85rem;color:var(--text-sub);">並び替え：</label>
+        <select class="form-select" id="sort-select" style="width:auto;padding:8px 14px;" aria-label="並び替え">
+          <option value="createdAt">新着順</option>
+          <option value="popular">人気順</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 検索バー -->
+    <div class="search-bar mb-32" role="search">
+      <div class="search-bar__inner">
+        <i class="fa fa-magnifying-glass search-bar__icon" aria-hidden="true"></i>
+        <input type="search" id="search-input" class="form-input search-bar__input"
+               placeholder="アプリ名・説明で検索..." aria-label="アプリを検索">
+        <button id="search-btn" class="btn btn--primary btn--sm">検索</button>
+      </div>
+    </div>
+
+    <div class="apps-grid" id="apps-grid" aria-live="polite" role="list"></div>
+    <div class="pagination" id="pagination" role="navigation" aria-label="ページネーション"></div>
+    <div id="apps-empty" class="apps-empty hidden">
+      <span class="apps-empty__icon">🔍</span>
+      <p>アプリが見つかりませんでした。</p>
+      <p class="text-sub">別のキーワードやカテゴリでお試しください。</p>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="site-logo">
+          <div class="site-logo__icon" style="background:rgba(255,255,255,0.2);">🍀</div>
+          <div class="site-logo__text">先生<span style="color:var(--salmon);">アプリ</span></div>
+        </a>
+        <p>先生たちがAIで自作したWebアプリを共有するプラットフォーム。</p>
+      </div>
+      <div class="footer-col">
+        <h4>サイトメニュー</h4>
+        <ul>
+          <li><a href="/">ホーム</a></li>
+          <li><a href="apps.html">アプリ一覧</a></li>
+          <li><a href="submit.html">アプリを投稿</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>法的情報</h4>
+        <ul>
+          <li><a href="terms.html">利用規約</a></li>
+          <li><a href="privacy.html">プライバシーポリシー</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 先生アプリ. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container" aria-live="polite"></div>
+
+<script type="module">
+  import { auth, getApps, loginWithGoogle, logout, onAuthStateChanged, getUserDoc } from "./js/firebase.js";
+
+  function escHtml(s) {
+    return String(s ?? "").replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function getEmoji(tags=[]) {
+    const map = {"校務支援":"📋","学級経営":"🏫","授業・教材":"📚","評価・採点":"✅","保護者連絡":"📨","特別支援":"🤝","ICT活用":"💻","部活・行事":"🎉","その他":"🌟"};
+    for (const t of tags) if (map[t]) return map[t];
+    return "🍀";
+  }
+  function showToast(msg, type="default") {
+    const c = document.getElementById("toast-container");
+    const icons = {success:"✅",error:"❌",warning:"⚠️",default:"📢"};
+    const t = document.createElement("div");
+    t.className = `toast toast--${type}`;
+    t.innerHTML = `<span>${icons[type]||icons.default}</span><span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+
+  let currentTag     = "";
+  let currentSort    = "createdAt";
+  let currentPage    = 1;
+  let lastDocStack   = [null];
+  let currentOffline = false;
+  const PAGE_SIZE    = 15;
+
+  function createSkeletons(n) {
+    return Array.from({length:n}, () => `
+      <div class="card app-card" aria-hidden="true">
+        <div class="app-card__thumb skeleton" style="height:160px;"></div>
+        <div class="app-card__body">
+          <div class="skeleton" style="height:16px;width:55%;border-radius:6px;margin-bottom:8px;"></div>
+          <div class="skeleton" style="height:22px;width:90%;border-radius:6px;margin-bottom:10px;"></div>
+          <div class="skeleton" style="height:13px;border-radius:6px;margin-bottom:4px;"></div>
+          <div class="skeleton" style="height:13px;width:65%;border-radius:6px;"></div>
+        </div>
+      </div>`).join("");
+  }
+
+  function renderCard(app) {
+    const tags = (app.tags||[]).slice(0,2).map(t => `<span class="badge badge--moss">${escHtml(t)}</span>`).join("");
+    const typeBadge = app.shareType === "html"
+      ? `<span class="badge badge--green">📦 ローカル動作</span>`
+      : `<span class="badge badge--gray">🔗 リンク</span>`;
+    const offlineBadge = app.offlineSupport
+      ? `<span class="badge badge--offline" title="インターネット不要で動作します">📴 オフライン動作対応</span>`
+      : "";
+    const thumb = app.thumbnailUrl
+      ? `<img src="${escHtml(app.thumbnailUrl)}" alt="${escHtml(app.title)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`
+      : `<div class="app-card__thumb-placeholder">${getEmoji(app.tags||[])}</div>`;
+    return `
+      <article class="card app-card" role="listitem">
+        <a href="app-detail.html?id=${escHtml(app.id)}" class="app-card__thumb" aria-label="${escHtml(app.title)}の詳細">
+          ${thumb}
+          <div class="app-card__type">${typeBadge}</div>
+        </a>
+        <div class="app-card__body">
+          <div class="app-card__tags" aria-label="カテゴリ">${tags}${offlineBadge}</div>
+          <h3 class="app-card__title"><a href="app-detail.html?id=${escHtml(app.id)}">${escHtml(app.title)}</a></h3>
+          <p class="app-card__desc">${escHtml((app.description||"").slice(0,80))}${(app.description||"").length>80?"…":""}</p>
+          <footer class="app-card__footer">
+            <span class="app-card__author">
+              ${app.authorPhoto ? `<img src="${escHtml(app.authorPhoto)}" alt="" class="app-card__author-icon">` : `<span class="app-card__author-icon app-card__author-icon--default">${escHtml((app.authorName||"先")[0])}</span>`}
+              ${escHtml(app.authorName||"先生")}
+            </span>
+            <span class="app-card__stats">❤️ ${app.likeCount||0} 👁 ${app.viewCount||0}</span>
+          </footer>
+        </div>
+      </article>`;
+  }
+
+  async function loadApps(reset = false) {
+    if (reset) { currentPage = 1; lastDocStack = [null]; }
+    const grid  = document.getElementById("apps-grid");
+    const empty = document.getElementById("apps-empty");
+    const count = document.getElementById("apps-count-label");
+    grid.setAttribute("aria-busy", "true");
+    grid.innerHTML = createSkeletons(PAGE_SIZE);
+    empty.classList.add("hidden");
+
+    try {
+      const { docs, lastDoc } = await getApps({
+        tags:        currentOffline ? [] : (currentTag ? [currentTag] : []),
+        sort:        currentSort,
+        pageSize:    PAGE_SIZE,
+        lastDoc:     lastDocStack[currentPage - 1],
+        offlineOnly: currentOffline
+      });
+      if (docs.length === PAGE_SIZE) lastDocStack[currentPage] = lastDoc;
+      if (!docs.length && currentPage === 1) {
+        grid.innerHTML = ""; empty.classList.remove("hidden");
+        count.textContent = "0件"; renderPagination(false, false); return;
+      }
+      grid.innerHTML = docs.map(renderCard).join("");
+      grid.setAttribute("aria-busy", "false");
+      count.textContent = `${docs.length}件表示中`;
+      renderPagination(currentPage > 1, docs.length === PAGE_SIZE);
+    } catch (e) {
+      console.error(e);
+      grid.innerHTML = `<p class="text-sub" style="padding:24px;">読み込みに失敗しました。</p>`;
+    }
+  }
+
+  function renderPagination(hasPrev, hasNext) {
+    const p = document.getElementById("pagination");
+    p.innerHTML = "";
+    if (!hasPrev && !hasNext) return;
+    if (hasPrev) {
+      const b = document.createElement("button");
+      b.textContent = "← 前へ"; b.setAttribute("aria-label","前のページ");
+      b.onclick = () => { currentPage--; loadApps(); window.scrollTo(0,400); };
+      p.appendChild(b);
+    }
+    const sp = document.createElement("button"); sp.textContent = currentPage; sp.classList.add("active"); sp.setAttribute("aria-current","page"); p.appendChild(sp);
+    if (hasNext) {
+      const b = document.createElement("button");
+      b.textContent = "次へ →"; b.setAttribute("aria-label","次のページ");
+      b.onclick = () => { currentPage++; loadApps(); window.scrollTo(0,400); };
+      p.appendChild(b);
+    }
+  }
+
+  // タグ
+  document.querySelectorAll(".tag").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tag").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentOffline = btn.dataset.offline === "1";
+      currentTag     = currentOffline ? "" : (btn.dataset.tag || "");
+      const label    = document.getElementById("apps-heading-label");
+      if (currentOffline) {
+        label.textContent = "📴 オフライン動作対応アプリ";
+      } else {
+        label.textContent = currentTag ? `「${currentTag}」のアプリ` : "すべてのアプリ";
+      }
+      loadApps(true);
+    });
+  });
+
+  // 並び替え
+  document.getElementById("sort-select").addEventListener("change", e => {
+    currentSort = e.target.value; loadApps(true);
+  });
+
+  // 検索
+  document.getElementById("search-btn").addEventListener("click", () => {
+    const v = document.getElementById("search-input").value.trim();
+    if (v) { location.href = `apps.html?search=${encodeURIComponent(v)}`; }
+  });
+  document.getElementById("search-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") document.getElementById("search-btn").click();
+  });
+
+  // 認証ヘッダー
+  onAuthStateChanged(auth, async (user) => {
+    const loginBtn = document.getElementById("login-btn");
+    const menuBtn  = document.getElementById("user-menu-btn");
+    const postBtn  = document.getElementById("post-btn");
+    const avatar   = document.getElementById("user-avatar");
+    const nameEl   = document.getElementById("user-name-display");
+
+    if (user) {
+      loginBtn?.classList.add("hidden");
+      menuBtn?.classList.remove("hidden");
+      postBtn?.classList.remove("hidden");
+      if (avatar) avatar.innerHTML = user.photoURL ? `<img src="${user.photoURL}" alt="">` : (user.displayName||"先")[0];
+      if (nameEl) nameEl.textContent = user.displayName || "先生";
+      try {
+        const uDoc = await getUserDoc(user.uid);
+        if (uDoc?.role === "admin") document.getElementById("admin-link")?.classList.remove("hidden");
+      } catch {}
+    } else {
+      loginBtn?.classList.remove("hidden");
+      menuBtn?.classList.add("hidden");
+      postBtn?.classList.add("hidden");
+    }
+    loginBtn?.addEventListener("click", async () => {
+      try { await loginWithGoogle(); } catch { showToast("ログインに失敗しました","error"); }
+    });
+    document.getElementById("logout-btn")?.addEventListener("click", async () => {
+      await logout(); location.reload();
+    });
+    document.getElementById("user-menu-btn")?.addEventListener("click", e => {
+      e.stopPropagation();
+      document.getElementById("dropdown-menu")?.classList.toggle("open");
+    });
+    document.addEventListener("click", () => { document.getElementById("dropdown-menu")?.classList.remove("open"); });
+  });
+
+  document.getElementById("hamburger-btn")?.addEventListener("click", () => {
+    document.getElementById("mobile-menu")?.classList.toggle("open");
+  });
+
+  // URLパラメータからタグ/検索
+  const params = new URLSearchParams(location.search);
+  const urlTag = params.get("tag");
+  const urlSearch = params.get("search");
+  if (urlTag) {
+    currentTag = urlTag;
+    document.querySelectorAll(".tag").forEach(b => b.classList.toggle("active", b.dataset.tag === urlTag));
+    document.getElementById("apps-heading-label").textContent = `「${urlTag}」のアプリ`;
+  }
+  if (urlSearch) {
+    document.getElementById("search-input").value = urlSearch;
+    document.getElementById("apps-heading-label").textContent = `「${urlSearch}」の検索結果`;
+  }
+
+  loadApps();
+</script>
+</body>
+</html>

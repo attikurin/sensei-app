@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マイページ - 先生アプリ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ===== マイページ専用スタイル ===== */
+    .mypage-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 32px;
+      padding: 48px 0 80px;
+      align-items: start;
+    }
+
+    /* プロフィールカード */
+    .profile-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 28px 20px;
+      text-align: center;
+      position: sticky;
+      top: 80px;
+    }
+    .profile-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      margin: 0 auto 14px;
+      overflow: hidden;
+      background: var(--moss);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; color: #fff; font-weight: 700;
+      border: 3px solid var(--border);
+    }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-name { font-size: 1.1rem; font-weight: 700; color: var(--moss-dark); margin-bottom: 4px; }
+    .profile-email { font-size: 0.8rem; color: var(--text-light); margin-bottom: 16px; }
+    .profile-stats {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-bottom: 20px;
+    }
+    .profile-stat {
+      background: var(--bg); border-radius: var(--radius-md);
+      padding: 10px 6px; text-align: center;
+      border: 1px solid var(--border);
+    }
+    .profile-stat__num { font-size: 1.4rem; font-weight: 700; color: var(--moss-dark); display: block; }
+    .profile-stat__label { font-size: 0.75rem; color: var(--text-sub); }
+
+    /* サイドナビ */
+    .side-nav { display: flex; flex-direction: column; gap: 4px; margin-top: 16px; }
+    .side-nav a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem; font-weight: 500;
+      color: var(--text-sub);
+      transition: all var(--transition);
+      text-decoration: none;
+    }
+    .side-nav a:hover, .side-nav a.active {
+      background: var(--surface-2); color: var(--moss);
+    }
+
+    /* 投稿一覧テーブル風 */
+    .apps-table { width: 100%; border-collapse: collapse; }
+    .apps-table th {
+      text-align: left; font-size: 0.82rem; font-weight: 700;
+      color: var(--text-sub); padding: 8px 12px;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+    .apps-table td {
+      padding: 14px 12px; border-bottom: 1px solid var(--border);
+      vertical-align: middle; font-size: 0.9rem;
+    }
+    .apps-table tr:hover td { background: var(--bg); }
+    .apps-table .app-thumb-cell {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .apps-table .app-thumb-mini {
+      width: 48px; height: 48px; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg,#E8F0E4,#D1E0CB);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0; overflow: hidden;
+    }
+    .apps-table .app-thumb-mini img { width:100%;height:100%;object-fit:cover; }
+    .apps-table .app-title-link {
+      font-weight: 600; color: var(--text-main);
+      text-decoration: none; transition: color var(--transition);
+    }
+    .apps-table .app-title-link:hover { color: var(--moss); }
+    .apps-table .app-desc-sub { font-size: 0.78rem; color: var(--text-sub); margin-top: 2px; }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 100px;
+      font-size: 0.78rem; font-weight: 600; white-space: nowrap;
+    }
+    .status-public  { background: #DCFCE7; color: #166534; }
+    .status-private { background: var(--surface-2); color: var(--text-sub); }
+
+    /* アクションボタン群（テーブル内） */
+    .row-actions { display: flex; gap: 6px; }
+    .row-actions button, .row-actions a {
+      padding: 5px 10px; border-radius: var(--radius-sm);
+      font-size: 0.78rem; font-weight: 600;
+      border: 1.5px solid var(--border); background: var(--surface);
+      color: var(--text-sub); cursor: pointer; text-decoration: none;
+      transition: all var(--transition); white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .row-actions .btn-edit:hover { border-color: var(--moss); color: var(--moss); background: #E8F0E4; }
+    .row-actions .btn-toggle:hover { border-color: var(--mustard); color: #8A6E00; background: #FBF0CE; }
+    .row-actions .btn-delete:hover { border-color: var(--salmon); color: var(--salmon); background: #FDDDD6; }
+
+    /* カードビュー（スマホ時） */
+    .my-app-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .my-app-card__header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+
+    /* セクションカード */
+    .content-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .content-card__header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; padding-bottom: 14px;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .content-card__title {
+      font-size: 1.05rem; font-weight: 700; color: var(--moss-dark);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    @media (max-width: 860px) {
+      .mypage-layout { grid-template-columns: 1fr; }
+      .profile-card { position: static; }
+      .apps-table { display: none; }
+    }
+    @media (min-width: 861px) {
+      .my-app-card { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<a href="#mypage-main" class="skip-link">メインコンテンツへスキップ</a>
+
+<!-- ヘッダー -->
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="site-logo">
+      <div class="site-logo__icon">🍀</div>
+      <div class="site-logo__text">先生<span>アプリ</span></div>
+    </a>
+    <nav class="site-nav">
+      <a href="/">ホーム</a>
+      <a href="apps.html">アプリ一覧</a>
+    </nav>
+    <div class="header-actions">
+      <button id="login-btn" class="btn btn--primary btn--sm"><i class="fa fa-right-to-bracket"></i> ログイン</button>
+      <a href="submit.html" id="post-btn" class="btn btn--mustard btn--sm hidden">＋ 投稿する</a>
+      <div class="dropdown">
+        <button id="user-menu-btn" class="user-avatar hidden" data-dropdown-trigger aria-label="ユーザーメニュー">
+          <span id="user-avatar">👤</span>
+        </button>
+        <div class="dropdown-menu" id="dropdown-menu">
+          <span id="user-name-display" style="padding:10px 16px;font-size:0.82rem;color:var(--text-sub);display:block;border-bottom:1px solid var(--border);"></span>
+          <a href="mypage.html" class="active"><i class="fa fa-house"></i> マイページ</a>
+          <a href="submit.html"><i class="fa fa-plus-circle"></i> アプリを投稿</a>
+          <a href="admin.html" id="admin-link" class="hidden"><i class="fa fa-shield-halved"></i> 管理者画面</a>
+          <hr>
+          <button id="logout-btn"><i class="fa fa-right-from-bracket"></i> ログアウト</button>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger-btn" aria-label="メニュー" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/"><i class="fa fa-home"></i> ホーム</a>
+    <a href="apps.html"><i class="fa fa-grid-2"></i> アプリ一覧</a>
+    <a href="submit.html"><i class="fa fa-plus-circle"></i> アプリを投稿</a>
+    <a href="mypage.html"><i class="fa fa-user"></i> マイページ</a>
+  </div>
+</header>
+
+<!-- ページヒーロー -->
+<div class="page-hero">
+  <div class="container">
+    <p class="page-hero__label">MY PAGE</p>
+    <h1>マイページ</h1>
+    <p>投稿したアプリの管理・編集・削除ができます。</p>
+  </div>
+</div>
+
+<!-- 未ログイン時 -->
+<div id="login-required" class="hidden" style="text-align:center;padding:80px 20px;">
+  <div class="container">
+    <div style="font-size:3rem;margin-bottom:16px;">🔐</div>
+    <h2>ログインが必要です</h2>
+    <p class="text-sub" style="margin:8px 0 24px;">マイページを表示するにはGoogleアカウントでログインしてください。</p>
+    <button id="login-required-btn" class="btn btn--primary btn--lg">
+      <i class="fa fa-right-to-bracket"></i> Googleでログイン
+    </button>
+  </div>
+</div>
+
+<!-- ログイン済みコンテンツ -->
+<main id="mypage-main" class="hidden">
+  <div class="container">
+    <div class="mypage-layout">
+
+      <!-- ===== サイドバー（プロフィール） ===== -->
+      <aside aria-label="プロフィール">
+        <div class="profile-card">
+          <div class="profile-avatar" id="profile-avatar">先</div>
+          <p class="profile-name" id="profile-name">---</p>
+          <p class="profile-email" id="profile-email">---</p>
+
+          <div class="profile-stats">
+            <div class="profile-stat">
+              <span class="profile-stat__num" id="stat-apps">0</span>
+              <span class="profile-stat__label">投稿数</span>
+            </div>
+            <div class="profile-stat">
+              <span class="profile-stat__num" id="stat-likes">0</span>
+              <span class="profile-stat__label">総いいね</span>
+            </div>
+            <div class="profile-stat">
+              <span class="profile-stat__num" id="stat-views">0</span>
+              <span class="profile-stat__label">総閲覧数</span>
+            </div>
+            <div class="profile-stat">
+              <span class="profile-stat__num" id="stat-public">0</span>
+              <span class="profile-stat__label">公開中</span>
+            </div>
+          </div>
+
+          <nav class="side-nav" aria-label="マイページメニュー">
+            <a href="submit.html" class="btn btn--mustard btn--full" style="justify-content:center;">
+              <i class="fa fa-plus-circle"></i> 新しいアプリを投稿
+            </a>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- ===== メインコンテンツ ===== -->
+      <div>
+        <!-- 投稿アプリ一覧 -->
+        <div class="content-card" role="region" aria-labelledby="my-apps-heading">
+          <div class="content-card__header">
+            <h2 class="content-card__title" id="my-apps-heading">
+              <i class="fa fa-grid-2" aria-hidden="true"></i> 投稿したアプリ
+              <span id="my-apps-count" class="badge badge--gray">0</span>
+            </h2>
+            <a href="submit.html" class="btn btn--primary btn--sm">
+              <i class="fa fa-plus"></i> 新規投稿
+            </a>
+          </div>
+
+          <!-- ローディング -->
+          <div id="my-apps-loading" style="text-align:center;padding:40px 0;">
+            <div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 12px;"></div>
+            <p class="text-sub">読み込み中...</p>
+          </div>
+
+          <!-- 空状態 -->
+          <div id="my-apps-empty" class="hidden" style="text-align:center;padding:40px 20px;">
+            <div style="font-size:2.5rem;margin-bottom:12px;">🌱</div>
+            <p class="fw-bold" style="margin-bottom:8px;">まだアプリを投稿していません</p>
+            <p class="text-sub" style="margin-bottom:20px;font-size:0.9rem;">AIで作ったアプリをシェアしてみましょう！</p>
+            <a href="submit.html" class="btn btn--mustard">
+              <i class="fa fa-plus-circle"></i> 最初のアプリを投稿する
+            </a>
+          </div>
+
+          <!-- テーブル（PC） -->
+          <div id="my-apps-table-wrap" class="hidden">
+            <table class="apps-table" aria-label="投稿アプリ一覧">
+              <thead>
+                <tr>
+                  <th>アプリ</th>
+                  <th>状態</th>
+                  <th>いいね</th>
+                  <th>閲覧</th>
+                  <th>投稿日</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="my-apps-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- カード（スマホ） -->
+          <div id="my-apps-cards" class="hidden"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- フッター -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom" style="margin-top:0;border-top:none;">
+      <p>© 2026 先生アプリ. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container" aria-live="polite"></div>
+
+<!-- 削除確認モーダル -->
+<div class="modal-overlay" id="delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+  <div class="modal">
+    <h3 id="delete-modal-title" style="margin-bottom:12px;">🗑️ アプリを削除しますか？</h3>
+    <p style="font-size:0.9rem;color:var(--text-sub);margin-bottom:24px;">
+      削除したアプリは元に戻せません。本当に削除しますか？
+    </p>
+    <div style="display:flex;gap:12px;">
+      <button id="confirm-delete" class="btn btn--salmon btn--full">削除する</button>
+      <button onclick="document.getElementById('delete-modal').classList.remove('open')" class="btn btn--ghost btn--full">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import {
+    auth, loginWithGoogle, logout, getMyApps, deleteApp, updateApp,
+    onAuthStateChanged, getUserDoc
+  } from "./js/firebase.js";
+
+  function escHtml(s) {
+    return String(s ?? "").replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function formatDate(ts) {
+    if (!ts) return "---";
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString("ja-JP",{year:"numeric",month:"short",day:"numeric"});
+  }
+  function showToast(msg, type="default") {
+    const c = document.getElementById("toast-container");
+    const icons = {success:"✅",error:"❌",warning:"⚠️",default:"📢"};
+    const t = document.createElement("div");
+    t.className = `toast toast--${type}`;
+    t.innerHTML = `<span>${icons[type]||icons.default}</span><span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+  function getEmoji(tags=[]) {
+    const map = {"校務支援":"📋","学級経営":"🏫","授業・教材":"📚","評価・採点":"✅","保護者連絡":"📨","特別支援":"🤝","ICT活用":"💻","部活・行事":"🎉","その他":"🌟"};
+    for (const t of tags) if (map[t]) return map[t];
+    return "🍀";
+  }
+
+  let deleteTargetId = null;
+  let myApps = [];
+
+  // ========== 認証 ==========
+  onAuthStateChanged(auth, async (user) => {
+    setupHeader(user);
+    if (!user) {
+      document.getElementById("login-required").classList.remove("hidden");
+      return;
+    }
+    document.getElementById("mypage-main").classList.remove("hidden");
+    renderProfile(user);
+    await loadMyApps(user.uid);
+  });
+
+  function renderProfile(user) {
+    const avEl = document.getElementById("profile-avatar");
+    if (user.photoURL) {
+      avEl.innerHTML = `<img src="${user.photoURL}" alt="${escHtml(user.displayName||'')}">`;
+    } else {
+      avEl.textContent = (user.displayName||"先")[0];
+    }
+    document.getElementById("profile-name").textContent  = user.displayName || "先生";
+    document.getElementById("profile-email").textContent = user.email || "";
+  }
+
+  async function loadMyApps(uid) {
+    try {
+      myApps = await getMyApps(uid);
+      myApps = myApps.filter(a => a.status !== "deleted");
+      document.getElementById("my-apps-loading").style.display = "none";
+
+      // 統計
+      document.getElementById("stat-apps").textContent   = myApps.length;
+      document.getElementById("stat-likes").textContent  = myApps.reduce((s,a) => s + (a.likeCount||0), 0);
+      document.getElementById("stat-views").textContent  = myApps.reduce((s,a) => s + (a.viewCount||0), 0);
+      document.getElementById("stat-public").textContent = myApps.filter(a => a.status === "public").length;
+      document.getElementById("my-apps-count").textContent = myApps.length;
+
+      if (!myApps.length) {
+        document.getElementById("my-apps-empty").classList.remove("hidden");
+        return;
+      }
+      document.getElementById("my-apps-table-wrap").classList.remove("hidden");
+      document.getElementById("my-apps-cards").classList.remove("hidden");
+      renderTable(myApps);
+      renderCards(myApps);
+    } catch (e) {
+      console.error(e);
+      document.getElementById("my-apps-loading").innerHTML =
+        `<p class="text-sub">読み込みに失敗しました。再読み込みしてください。</p>`;
+    }
+  }
+
+  function renderTable(apps) {
+    const tbody = document.getElementById("my-apps-tbody");
+    tbody.innerHTML = apps.map(app => `
+      <tr data-id="${escHtml(app.id)}">
+        <td>
+          <div class="app-thumb-cell">
+            <div class="app-thumb-mini">
+              ${app.thumbnailUrl
+                ? `<img src="${escHtml(app.thumbnailUrl)}" alt="">`
+                : getEmoji(app.tags||[])}
+            </div>
+            <div>
+              <a href="app-detail.html?id=${escHtml(app.id)}" class="app-title-link">${escHtml(app.title)}</a>
+              <p class="app-desc-sub">${(app.tags||[]).join(" / ")}</p>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span class="status-badge ${app.status === 'public' ? 'status-public' : 'status-private'}">
+            ${app.status === 'public' ? '✅ 公開中' : '🔒 非公開'}
+          </span>
+        </td>
+        <td>❤️ ${app.likeCount||0}</td>
+        <td>👁 ${app.viewCount||0}</td>
+        <td>${formatDate(app.createdAt)}</td>
+        <td>
+          <div class="row-actions">
+            <a href="app-detail.html?id=${escHtml(app.id)}" class="btn-edit"><i class="fa fa-eye"></i> 表示</a>
+            <a href="submit.html?edit=${escHtml(app.id)}" class="btn-edit"><i class="fa fa-pen"></i> 編集</a>
+            <button class="btn-toggle" onclick="toggleStatus('${escHtml(app.id)}', '${app.status}')">
+              ${app.status === 'public' ? '<i class="fa fa-eye-slash"></i> 非公開' : '<i class="fa fa-eye"></i> 公開'}
+            </button>
+            <button class="btn-delete" onclick="confirmDelete('${escHtml(app.id)}')">
+              <i class="fa fa-trash"></i> 削除
+            </button>
+          </div>
+        </td>
+      </tr>`).join("");
+  }
+
+  function renderCards(apps) {
+    const container = document.getElementById("my-apps-cards");
+    container.innerHTML = apps.map(app => `
+      <div class="my-app-card" data-id="${escHtml(app.id)}">
+        <div class="my-app-card__header">
+          <div class="app-thumb-mini">
+            ${app.thumbnailUrl
+              ? `<img src="${escHtml(app.thumbnailUrl)}" alt="">`
+              : getEmoji(app.tags||[])}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <a href="app-detail.html?id=${escHtml(app.id)}" class="app-title-link fw-bold">${escHtml(app.title)}</a>
+            <p style="font-size:0.78rem;color:var(--text-sub);margin-top:2px;">${(app.tags||[]).join(" / ")}</p>
+          </div>
+          <span class="status-badge ${app.status === 'public' ? 'status-public' : 'status-private'}">
+            ${app.status === 'public' ? '公開中' : '非公開'}
+          </span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:0.78rem;color:var(--text-sub);margin-bottom:10px;">
+          <span>❤️ ${app.likeCount||0}</span>
+          <span>👁 ${app.viewCount||0}</span>
+          <span>📅 ${formatDate(app.createdAt)}</span>
+        </div>
+        <div class="row-actions" style="flex-wrap:wrap;">
+          <a href="submit.html?edit=${escHtml(app.id)}" class="btn-edit"><i class="fa fa-pen"></i> 編集</a>
+          <button class="btn-toggle" onclick="toggleStatus('${escHtml(app.id)}', '${app.status}')">
+            ${app.status === 'public' ? '<i class="fa fa-eye-slash"></i> 非公開' : '<i class="fa fa-eye"></i> 公開'}
+          </button>
+          <button class="btn-delete" onclick="confirmDelete('${escHtml(app.id)}')">
+            <i class="fa fa-trash"></i> 削除
+          </button>
+        </div>
+      </div>`).join("");
+  }
+
+  // ========== 非公開/公開切り替え ==========
+  window.toggleStatus = async function(appId, currentStatus) {
+    const newStatus = currentStatus === "public" ? "private" : "public";
+    try {
+      await updateApp(appId, { status: newStatus });
+      showToast(newStatus === "public" ? "公開しました！" : "非公開にしました", "success");
+      const user = auth.currentUser;
+      if (user) await loadMyApps(user.uid);
+    } catch { showToast("変更に失敗しました", "error"); }
+  };
+
+  // ========== 削除 ==========
+  window.confirmDelete = function(appId) {
+    deleteTargetId = appId;
+    document.getElementById("delete-modal").classList.add("open");
+  };
+
+  document.getElementById("confirm-delete").addEventListener("click", async () => {
+    if (!deleteTargetId) return;
+    try {
+      await deleteApp(deleteTargetId);
+      document.getElementById("delete-modal").classList.remove("open");
+      showToast("アプリを削除しました", "success");
+      const user = auth.currentUser;
+      if (user) await loadMyApps(user.uid);
+    } catch { showToast("削除に失敗しました", "error"); }
+    deleteTargetId = null;
+  });
+
+  // ========== ヘッダー ==========
+  function setupHeader(user) {
+    const loginBtn = document.getElementById("login-btn");
+    const menuBtn  = document.getElementById("user-menu-btn");
+    const postBtn  = document.getElementById("post-btn");
+    const avatar   = document.getElementById("user-avatar");
+    const nameEl   = document.getElementById("user-name-display");
+
+    if (user) {
+      loginBtn?.classList.add("hidden");
+      menuBtn?.classList.remove("hidden");
+      postBtn?.classList.remove("hidden");
+      if (avatar) avatar.innerHTML = user.photoURL
+        ? `<img src="${user.photoURL}" alt="">` : (user.displayName||"先")[0];
+      if (nameEl) nameEl.textContent = user.displayName || "先生";
+    } else {
+      loginBtn?.classList.remove("hidden");
+      menuBtn?.classList.add("hidden");
+      postBtn?.classList.add("hidden");
+    }
+    loginBtn?.addEventListener("click", async () => {
+      try { await loginWithGoogle(); }
+      catch { showToast("ログインに失敗しました", "error"); }
+    });
+    document.getElementById("logout-btn")?.addEventListener("click", async () => {
+      await logout(); location.href = "/";
+    });
+    document.getElementById("user-menu-btn")?.addEventListener("click", e => {
+      e.stopPropagation();
+      document.getElementById("dropdown-menu")?.classList.toggle("open");
+    });
+    document.addEventListener("click", () => {
+      document.getElementById("dropdown-menu")?.classList.remove("open");
+    });
+  }
+
+  document.getElementById("login-required-btn")?.addEventListener("click", async () => {
+    try { await loginWithGoogle(); }
+    catch { showToast("ログインに失敗しました", "error"); }
+  });
+
+  document.getElementById("hamburger-btn")?.addEventListener("click", () => {
+    document.getElementById("mobile-menu").classList.toggle("open");
+  });
+</script>
+</body>
+</html>
