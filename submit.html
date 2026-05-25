@@ -70,6 +70,35 @@
     .share-type-option .option-title { font-weight: 700; font-size: 0.95rem; color: var(--moss-dark); }
     .share-type-option .option-desc  { font-size: 0.8rem; color: var(--text-sub); line-height: 1.5; }
 
+    /* サムネイルタブ切り替え */
+    .thumb-tabs { display: flex; gap: 0; border: 1.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 12px; }
+    .thumb-tab {
+      flex: 1; padding: 8px 12px; font-size: 0.85rem; font-weight: 600;
+      background: var(--bg); color: var(--text-sub); border: none; cursor: pointer;
+      transition: all var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .thumb-tab.active { background: var(--moss); color: #fff; }
+    .thumb-tab:not(.active):hover { background: var(--surface-2); }
+
+    /* サムネイル画像ドロップエリア */
+    .thumb-drop {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+      background: var(--bg);
+      position: relative;
+    }
+    .thumb-drop:hover, .thumb-drop.drag-over { border-color: var(--moss); background: #E8F0E4; }
+    .thumb-drop__icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+    .thumb-drop__text { font-size: 0.85rem; color: var(--text-sub); }
+    .thumb-preview-wrap { margin-top: 10px; display: none; }
+    .thumb-preview-wrap img { max-height: 160px; border-radius: var(--radius-sm); object-fit: cover; border: 1.5px solid var(--border); }
+    .thumb-preview-clear { font-size: 0.78rem; color: var(--salmon); cursor: pointer; margin-top: 4px; display: inline-block; }
+    #thumb-file-input { display: none; }
+
     /* ファイルアップロードエリア */
     .file-drop {
       border: 2px dashed var(--border);
@@ -88,6 +117,7 @@
     .file-drop__text { font-size: 0.88rem; color: var(--text-sub); }
     .file-drop__selected { font-size: 0.88rem; color: var(--moss); font-weight: 600; margin-top: 8px; }
     #html-file-input { display: none; }
+    #thumb-file-input { display: none; }
 
     /* サイドバーのヒント */
     .hint-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 22px; margin-bottom: 16px; }
@@ -276,11 +306,45 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="field-thumbnail">サムネイル画像URL（任意）</label>
-                <input type="url" id="field-thumbnail" name="thumbnailUrl" class="form-input"
-                       placeholder="https://example.com/image.png"
-                       aria-describedby="thumb-hint">
-                <p class="form-hint" id="thumb-hint">アプリのスクリーンショット等のURLを入力（省略可）。省略時はカテゴリに合わせた絵文字が表示されます。</p>
+                <p class="form-label">サムネイル画像（任意）</p>
+                <!-- タブ切り替え -->
+                <div class="thumb-tabs" role="tablist" aria-label="サムネイル設定方法">
+                  <button type="button" class="thumb-tab active" id="thumb-tab-upload"
+                          role="tab" aria-selected="true" aria-controls="thumb-panel-upload">
+                    <i class="fa fa-upload"></i> 画像をアップロード
+                  </button>
+                  <button type="button" class="thumb-tab" id="thumb-tab-url"
+                          role="tab" aria-selected="false" aria-controls="thumb-panel-url">
+                    <i class="fa fa-link"></i> URLで指定
+                  </button>
+                </div>
+
+                <!-- パネル：ファイルアップロード -->
+                <div id="thumb-panel-upload" role="tabpanel" aria-labelledby="thumb-tab-upload">
+                  <div class="thumb-drop" id="thumb-drop-area" tabindex="0"
+                       role="button" aria-label="サムネイル画像をドラッグ＆ドロップまたはクリックして選択">
+                    <input type="file" id="thumb-file-input" accept="image/jpeg,image/png,image/gif,image/webp">
+                    <span class="thumb-drop__icon">🖼️</span>
+                    <p class="thumb-drop__text">ここに画像をドラッグ＆ドロップ<br>またはクリックして選択</p>
+                    <p class="thumb-drop__text" style="margin-top:4px;font-size:0.78rem;">JPG / PNG / GIF / WebP・最大3MB</p>
+                  </div>
+                  <!-- プレビュー -->
+                  <div class="thumb-preview-wrap" id="thumb-preview-wrap">
+                    <img id="thumb-preview-img" src="" alt="サムネイルプレビュー">
+                    <br>
+                    <span class="thumb-preview-clear" id="thumb-preview-clear">✕ 画像を削除</span>
+                  </div>
+                </div>
+
+                <!-- パネル：URL入力 -->
+                <div id="thumb-panel-url" role="tabpanel" aria-labelledby="thumb-tab-url" style="display:none;">
+                  <input type="url" id="field-thumbnail" name="thumbnailUrl" class="form-input"
+                         placeholder="https://example.com/image.png"
+                         aria-describedby="thumb-hint">
+                  <p class="form-hint" id="thumb-hint">スクリーンショット等の公開URLを入力してください</p>
+                </div>
+
+                <p class="form-hint" style="margin-top:6px;">省略するとカテゴリに合わせた絵文字が表示されます</p>
               </div>
             </div>
 
@@ -503,7 +567,7 @@
 <div id="toast-container" aria-live="polite"></div>
 
 <script type="module">
-  import { auth, submitApp, updateApp, getApp, loginWithGoogle, logout, onAuthStateChanged }
+  import { auth, submitApp, updateApp, getApp, loginWithGoogle, logout, onAuthStateChanged, uploadThumbnail }
     from "./js/firebase.js";
 
   function showToast(msg, type="default") {
@@ -518,7 +582,77 @@
 
   const params = new URLSearchParams(location.search);
   const editId = params.get("edit"); // 編集モードのアプリID
-  let selectedHtmlFile = null;
+  let selectedHtmlFile  = null;
+  let selectedThumbFile = null;  // サムネイル画像ファイル
+
+  // ========== サムネイル：タブ切り替え ==========
+  document.getElementById("thumb-tab-upload").addEventListener("click", () => {
+    document.getElementById("thumb-tab-upload").classList.add("active");
+    document.getElementById("thumb-tab-url").classList.remove("active");
+    document.getElementById("thumb-panel-upload").style.display = "";
+    document.getElementById("thumb-panel-url").style.display = "none";
+    document.getElementById("thumb-tab-upload").setAttribute("aria-selected", "true");
+    document.getElementById("thumb-tab-url").setAttribute("aria-selected", "false");
+  });
+  document.getElementById("thumb-tab-url").addEventListener("click", () => {
+    document.getElementById("thumb-tab-url").classList.add("active");
+    document.getElementById("thumb-tab-upload").classList.remove("active");
+    document.getElementById("thumb-panel-url").style.display = "";
+    document.getElementById("thumb-panel-upload").style.display = "none";
+    document.getElementById("thumb-tab-url").setAttribute("aria-selected", "true");
+    document.getElementById("thumb-tab-upload").setAttribute("aria-selected", "false");
+  });
+
+  // ========== サムネイル：ドロップ＆クリック ==========
+  const thumbDropArea  = document.getElementById("thumb-drop-area");
+  const thumbFileInput = document.getElementById("thumb-file-input");
+
+  thumbDropArea.addEventListener("click", () => thumbFileInput.click());
+  thumbDropArea.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") thumbFileInput.click(); });
+
+  ["dragenter","dragover"].forEach(evt => {
+    thumbDropArea.addEventListener(evt, e => { e.preventDefault(); thumbDropArea.classList.add("drag-over"); });
+  });
+  ["dragleave","drop"].forEach(evt => {
+    thumbDropArea.addEventListener(evt, e => { e.preventDefault(); thumbDropArea.classList.remove("drag-over"); });
+  });
+  thumbDropArea.addEventListener("drop", e => {
+    const file = e.dataTransfer.files[0];
+    if (file) handleThumbSelect(file);
+  });
+  thumbFileInput.addEventListener("change", () => {
+    if (thumbFileInput.files[0]) handleThumbSelect(thumbFileInput.files[0]);
+  });
+
+  function handleThumbSelect(file) {
+    const allowed = ["image/jpeg","image/png","image/gif","image/webp"];
+    if (!allowed.includes(file.type)) {
+      showToast("JPG / PNG / GIF / WebP のみアップロードできます", "error");
+      return;
+    }
+    if (file.size > 3 * 1024 * 1024) {
+      showToast("ファイルサイズが3MBを超えています", "error");
+      return;
+    }
+    selectedThumbFile = file;
+    // プレビュー表示
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById("thumb-preview-img").src = e.target.result;
+      document.getElementById("thumb-preview-wrap").style.display = "block";
+      thumbDropArea.style.display = "none";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // 画像削除ボタン
+  document.getElementById("thumb-preview-clear").addEventListener("click", () => {
+    selectedThumbFile = null;
+    thumbFileInput.value = "";
+    document.getElementById("thumb-preview-img").src = "";
+    document.getElementById("thumb-preview-wrap").style.display = "none";
+    thumbDropArea.style.display = "";
+  });
 
   // ========== 認証チェック ==========
   onAuthStateChanged(auth, async (user) => {
@@ -554,7 +688,12 @@
       document.getElementById("field-description").value = app.description || "";
       document.getElementById("field-howto").value       = app.howto || "";
       document.getElementById("field-prompt").value      = app.prompt || "";
-      document.getElementById("field-thumbnail").value   = app.thumbnailUrl || "";
+      // サムネイル：既存URLがあればURL欄に表示し、プレビューも出す
+      if (app.thumbnailUrl) {
+        // URLタブをアクティブにしてURLをセット
+        document.getElementById("thumb-tab-url").click();
+        document.getElementById("field-thumbnail").value = app.thumbnailUrl;
+      }
       if (app.aiTool) document.getElementById("field-ai-tool").value = app.aiTool;
 
       (app.tags || []).forEach(t => {
@@ -726,14 +865,33 @@
 
     const btn = document.getElementById("submit-btn");
     btn.disabled = true;
-    btn.innerHTML = `<span class="loading-spinner" style="width:20px;height:20px;border-width:2px;"></span> 投稿中...`;
+
+    // サムネイルURL決定：ファイルUP優先 → URL入力 → null
+    let thumbnailUrl = null;
+    if (selectedThumbFile) {
+      try {
+        btn.innerHTML = `<span class="loading-spinner" style="width:20px;height:20px;border-width:2px;"></span> 画像アップロード中...`;
+        thumbnailUrl = await uploadThumbnail(user.uid, selectedThumbFile);
+      } catch (err) {
+        console.error(err);
+        showToast("サムネイルのアップロードに失敗しました", "error");
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa fa-paper-plane"></i> <span>${editId ? "更新する" : "投稿する"}</span>`;
+        return;
+      }
+    } else {
+      const urlInput = document.getElementById("field-thumbnail").value.trim();
+      thumbnailUrl = urlInput || null;
+    }
+
+    btn.innerHTML = `<span class="loading-spinner" style="width:20px;height:20px;border-width:2px;"></span> ${editId ? "更新中..." : "投稿中..."}`;
 
     const data = {
       title:          document.getElementById("field-title").value.trim(),
       description:    document.getElementById("field-description").value.trim(),
       howto:          document.getElementById("field-howto").value.trim(),
       prompt:         document.getElementById("field-prompt").value.trim(),
-      thumbnailUrl:   document.getElementById("field-thumbnail").value.trim() || null,
+      thumbnailUrl,
       aiTool:         document.getElementById("field-ai-tool").value || null,
       appUrl:         shareType === "link" ? document.getElementById("field-app-url").value.trim() : null,
       offlineSupport: document.getElementById("field-offline").checked,

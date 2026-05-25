@@ -60,7 +60,7 @@
       padding-bottom: 6px;
       border-bottom: 2px solid var(--mustard);
     }
-    .detail-section p, .detail-section ul { font-size: 0.95rem; line-height: 1.8; color: var(--text-main); }
+    .detail-section p, .detail-section ul { font-size: 0.95rem; line-height: 1.8; color: var(--text-main); overflow-wrap: break-word; word-break: break-word; }
     .detail-section ul { padding-left: 20px; list-style: disc; }
 
     /* プロンプト */
@@ -139,7 +139,7 @@
     /* メタ情報リスト */
     .meta-list { display: flex; flex-direction: column; gap: 10px; }
     .meta-list dt { font-size: 0.78rem; color: var(--text-light); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-    .meta-list dd { font-size: 0.9rem; color: var(--text-main); }
+    .meta-list dd { font-size: 0.9rem; color: var(--text-main); word-break: break-all; overflow-wrap: break-word; }
 
     /* 警告ボックス */
     .caution-box {

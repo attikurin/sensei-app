@@ -87,6 +87,19 @@ async function getUserDoc(uid) {
 }
 
 /**
+ * サムネイル画像をFirebase Storageにアップロードし、ダウンロードURLを返す
+ * @param {string} uid - ユーザーUID
+ * @param {File} file  - 画像ファイル（jpg/png/gif/webp、最大3MB）
+ * @returns {Promise<string>} ダウンロードURL
+ */
+async function uploadThumbnail(uid, file) {
+  const ext = file.name.split(".").pop().toLowerCase();
+  const storageRef = ref(storage, `thumbnails/${uid}/${Date.now()}.${ext}`);
+  await uploadBytes(storageRef, file);
+  return await getDownloadURL(storageRef);
+}
+
+/**
  * プロフィール（ニックネーム・アイコン絵文字）を更新する
  * @param {string} uid
  * @param {object} profile - { displayName, iconEmoji }
@@ -334,7 +347,7 @@ async function setPickup(appId, pickup, pickupOrder = 999) {
 window.FB = {
   auth, db, storage,
   loginWithGoogle, logout,
-  getUserDoc, isAdmin, updateUserProfile,
+  getUserDoc, isAdmin, updateUserProfile, uploadThumbnail,
   getApps, getPickupApps, getApp, getMyApps,
   submitApp, updateApp, deleteApp,
   incrementView, toggleLike, hasLiked,
@@ -347,7 +360,7 @@ window.FB = {
 export {
   auth, db, storage,
   loginWithGoogle, logout,
-  getUserDoc, isAdmin, updateUserProfile,
+  getUserDoc, isAdmin, updateUserProfile, uploadThumbnail,
   getApps, getPickupApps, getApp, getMyApps,
   submitApp, updateApp, deleteApp,
   incrementView, toggleLike, hasLiked,
