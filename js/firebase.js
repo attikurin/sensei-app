@@ -180,16 +180,21 @@ async function getApp(appId) {
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
-/** 自分の投稿アプリ一覧 */
+/** 自分の投稿アプリ一覧（複合インデックス不要：JS側でソート） */
 async function getMyApps(uid) {
   const q = query(
     collection(db, "apps"),
-    where("authorUid", "==", uid),
-    orderBy("createdAt", "desc")
+    where("authorUid", "==", uid)
   );
   const snap = await getDocs(q);
   const docs = [];
   snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
+  // createdAt降順でJS側ソート
+  docs.sort((a, b) => {
+    const ta = a.createdAt?.toDate?.() ?? new Date(a.createdAt ?? 0);
+    const tb = b.createdAt?.toDate?.() ?? new Date(b.createdAt ?? 0);
+    return tb - ta;
+  });
   return docs;
 }
 
@@ -342,6 +347,47 @@ async function setPickup(appId, pickup, pickupOrder = 999) {
 }
 
 // =============================================
+// お問い合わせ (messages コレクション) ヘルパー
+// =============================================
+
+/**
+ * お問い合わせを送信する
+ * @param {object} data - { category, name, email, body, uid, displayName }
+ */
+async function sendMessage(data) {
+  await addDoc(collection(db, "messages"), {
+    ...data,
+    status:    "unread",   // "unread" | "read"
+    adminNote: "",
+    createdAt: serverTimestamp()
+  });
+}
+
+/** 管理者：全メッセージ取得 */
+async function getAllMessages() {
+  const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+  const snap = await getDocs(q);
+  const docs = [];
+  snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
+  return docs;
+}
+
+/** 管理者：既読/未読を切り替える */
+async function markMessageRead(msgId, status = "read") {
+  await updateDoc(doc(db, "messages", msgId), { status });
+}
+
+/** 管理者：返信メモ保存 */
+async function saveMessageNote(msgId, note) {
+  await updateDoc(doc(db, "messages", msgId), { adminNote: note, updatedAt: serverTimestamp() });
+}
+
+/** 管理者：メッセージ削除 */
+async function deleteMessage(msgId) {
+  await deleteDoc(doc(db, "messages", msgId));
+}
+
+// =============================================
 // エクスポート（グローバル公開）
 // =============================================
 window.FB = {
@@ -354,6 +400,7 @@ window.FB = {
   getNotices, addNotice, deleteNotice,
   getAllAppsAdmin, getAllUsersAdmin,
   banUser, unbanUser, forceDeleteApp, setPickup,
+  sendMessage, getAllMessages, markMessageRead, saveMessageNote, deleteMessage,
   onAuthStateChanged
 };
 
@@ -367,5 +414,6 @@ export {
   getNotices, addNotice, deleteNotice,
   getAllAppsAdmin, getAllUsersAdmin,
   banUser, unbanUser, forceDeleteApp, setPickup,
+  sendMessage, getAllMessages, markMessageRead, saveMessageNote, deleteMessage,
   onAuthStateChanged
 };

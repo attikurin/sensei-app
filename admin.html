@@ -239,6 +239,10 @@
         <a href="#" data-tab-target="tab-notices" onclick="switchTab(event,'tab-notices')">
           <i class="fa fa-bell"></i> お知らせ管理
         </a>
+        <a href="#" data-tab-target="tab-messages" onclick="switchTab(event,'tab-messages')">
+          <i class="fa fa-envelope"></i> 問い合わせ
+          <span class="badge badge--salmon" id="unread-badge" style="margin-left:auto;display:none;"></span>
+        </a>
         <hr style="margin:10px 0;border-color:var(--border);">
         <a href="/" style="color:var(--salmon);">
           <i class="fa fa-arrow-left"></i> サイトに戻る
@@ -399,6 +403,50 @@
           </div>
         </div>
 
+        <!-- ===== タブ：問い合わせ管理 ===== -->
+        <div id="tab-messages" class="admin-tab-panel">
+          <div class="admin-card">
+            <div class="admin-card__header">
+              <h2 class="admin-card__title"><i class="fa fa-envelope"></i> 問い合わせ管理</h2>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <select id="msg-filter" class="form-select" style="width:130px;padding:6px 12px;" aria-label="既読フィルター">
+                  <option value="all">すべて</option>
+                  <option value="unread">未読のみ</option>
+                  <option value="read">既読のみ</option>
+                </select>
+              </div>
+            </div>
+            <div class="admin-card__body">
+              <div id="messages-loading" style="text-align:center;padding:40px;">
+                <div class="loading-spinner" style="margin:0 auto;"></div>
+              </div>
+              <div id="messages-list" style="display:none;"></div>
+            </div>
+          </div>
+
+          <!-- 詳細モーダル -->
+          <div class="modal-overlay" id="msg-detail-modal" role="dialog" aria-modal="true" aria-labelledby="msg-modal-title">
+            <div class="modal" style="max-width:560px;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+                <h3 id="msg-modal-title" style="font-size:1.05rem;color:var(--moss-dark);">問い合わせ詳細</h3>
+                <button onclick="document.getElementById('msg-detail-modal').classList.remove('open')" class="btn btn--ghost btn--sm" aria-label="閉じる">
+                  <i class="fa fa-xmark"></i>
+                </button>
+              </div>
+              <div id="msg-modal-body"></div>
+              <div style="margin-top:20px;">
+                <label class="form-label" for="admin-note">管理者メモ（返信内容など）</label>
+                <textarea id="admin-note" class="form-textarea" rows="4" placeholder="返信済み・対応内容などをメモ"></textarea>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:12px;">
+                <button id="save-note-btn" class="btn btn--primary btn--sm"><i class="fa fa-save"></i> メモを保存</button>
+                <button id="toggle-read-btn" class="btn btn--ghost btn--sm"></button>
+                <button id="delete-msg-btn" class="btn btn--sm" style="color:var(--salmon);border-color:var(--salmon);margin-left:auto;"><i class="fa fa-trash"></i> 削除</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div><!-- /メインエリア -->
     </div>
   </div>
@@ -411,7 +459,8 @@
     auth, isAdmin, getAllAppsAdmin, getAllUsersAdmin,
     banUser, unbanUser, forceDeleteApp, setPickup,
     addNotice, getNotices, deleteNotice, updateApp,
-    onAuthStateChanged, getUserDoc
+    getAllMessages, markMessageRead, saveMessageNote, deleteMessage,
+    onAuthStateChanged
   } from "./js/firebase.js";
 
   function escHtml(s) {
@@ -457,6 +506,8 @@
     document.getElementById("admin-user-label").textContent = `${user.displayName || "管理者"} (管理者)`;
 
     await Promise.all([loadApps(), loadUsers(), loadNoticesList()]);
+    // messagesはタブを開いたときに初回ロード（未読バッジのみ先読みする）
+    loadMessagesBadge();
   });
 
   // ========== ログアウト ==========
@@ -475,6 +526,12 @@
     e.currentTarget.classList.add("active");
 
     if (tabId === "tab-pickup") loadPickupList();
+    if (tabId === "tab-messages") {
+      allMessages = [];
+      document.getElementById("messages-loading").style.display = "";
+      document.getElementById("messages-list").style.display = "none";
+      loadMessages();
+    }
   };
 
   // ========== アプリ一覧 ==========
@@ -721,6 +778,168 @@
       await loadNoticesList();
     } catch { showToast("削除に失敗しました", "error"); }
   };
+
+  // ========== 問い合わせ管理 ==========
+  let allMessages  = [];
+  let currentMsgId = null;
+  let messagesBadgeLoaded = false;
+
+  // 未読件数のみ先読みしナビバッジに反映する
+  async function loadMessagesBadge() {
+    if (messagesBadgeLoaded) return;
+    try {
+      const msgs = await getAllMessages();
+      const unread = msgs.filter(m => m.status === "unread").length;
+      const badge = document.getElementById("unread-badge");
+      if (unread > 0) { badge.textContent = unread; badge.style.display = ""; }
+      messagesBadgeLoaded = true;
+    } catch (e) { console.error(e); }
+  }
+
+  const CATEGORY_ICONS = { "質問":"❓", "要望":"💡", "不具合":"🐛", "その他":"💬" };
+
+  async function loadMessages() {
+    try {
+      allMessages = await getAllMessages();
+      const unread = allMessages.filter(m => m.status === "unread").length;
+      const badge = document.getElementById("unread-badge");
+      if (unread > 0) {
+        badge.textContent = unread;
+        badge.style.display = "";
+      } else {
+        badge.style.display = "none";
+      }
+      renderMessages();
+      document.getElementById("messages-loading").style.display = "none";
+      document.getElementById("messages-list").style.display = "";
+    } catch (e) {
+      console.error(e);
+      document.getElementById("messages-loading").innerHTML = `<p class="text-sub">読み込みに失敗しました</p>`;
+    }
+  }
+
+  function renderMessages() {
+    const filter = document.getElementById("msg-filter")?.value || "all";
+    const filtered = allMessages.filter(m => filter === "all" || m.status === filter);
+    const container = document.getElementById("messages-list");
+
+    if (!filtered.length) {
+      container.innerHTML = `<p class="text-sub" style="padding:20px 0;text-align:center;">${ filter === "unread" ? "未読のメッセージはありません 🎉" : "問い合わせはありません" }</p>`;
+      return;
+    }
+
+    container.innerHTML = filtered.map(m => `
+      <div class="notice-row" style="cursor:pointer;gap:10px;padding:14px 16px;
+        background:${m.status === 'unread' ? '#F0F7EC' : 'var(--surface)'};
+        border-left:3px solid ${m.status === 'unread' ? 'var(--moss)' : 'var(--border)'};"
+        onclick="openMsgDetail('${escHtml(m.id)}')">
+        <span style="font-size:1.3rem;flex-shrink:0;">${CATEGORY_ICONS[m.category] || "💬"}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <span class="badge ${m.status === 'unread' ? 'badge--moss' : 'badge--gray'}" style="font-size:0.7rem;">
+              ${m.status === 'unread' ? '🔴 未読' : '✅ 既読'}
+            </span>
+            <span class="badge badge--gray" style="font-size:0.7rem;">${escHtml(m.category||"その他")}</span>
+            <span style="font-size:0.78rem;color:var(--text-light);margin-left:auto;white-space:nowrap;">${formatDate(m.createdAt)}</span>
+          </div>
+          <p style="font-weight:600;font-size:0.9rem;color:var(--text-main);margin-bottom:2px;">${escHtml(m.name||"匿名")}
+            ${m.email ? `<span style="font-size:0.78rem;color:var(--text-sub);font-weight:400;"> &lt;${escHtml(m.email)}&gt;</span>` : ""}
+          </p>
+          <p style="font-size:0.83rem;color:var(--text-sub);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+            ${escHtml(m.body||"")}
+          </p>
+        </div>
+        <i class="fa fa-chevron-right" style="color:var(--border);flex-shrink:0;"></i>
+      </div>`).join("");
+  }
+
+  document.getElementById("msg-filter")?.addEventListener("change", renderMessages);
+
+  window.openMsgDetail = async function(msgId) {
+    const m = allMessages.find(x => x.id === msgId);
+    if (!m) return;
+    currentMsgId = msgId;
+
+    // 未読なら既読にする
+    if (m.status === "unread") {
+      await markMessageRead(msgId);
+      m.status = "read";
+      renderMessages();
+      const unread = allMessages.filter(x => x.status === "unread").length;
+      const badge = document.getElementById("unread-badge");
+      badge.textContent = unread;
+      badge.style.display = unread > 0 ? "" : "none";
+    }
+
+    // モーダル内容
+    document.getElementById("msg-modal-body").innerHTML = `
+      <dl style="display:grid;grid-template-columns:90px 1fr;gap:8px 12px;font-size:0.88rem;margin-bottom:4px;">
+        <dt style="color:var(--text-light);font-weight:600;">種類</dt>
+        <dd>${CATEGORY_ICONS[m.category]||"💬"} ${escHtml(m.category||"その他")}</dd>
+        <dt style="color:var(--text-light);font-weight:600;">送信者</dt>
+        <dd>${escHtml(m.name||"匿名")}</dd>
+        <dt style="color:var(--text-light);font-weight:600;">メール</dt>
+        <dd>${m.email ? `<a href="mailto:${escHtml(m.email)}" style="color:var(--moss);">${escHtml(m.email)}</a>` : "未入力"}</dd>
+        <dt style="color:var(--text-light);font-weight:600;">受信日</dt>
+        <dd>${formatDate(m.createdAt)}</dd>
+      </dl>
+      <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;margin-top:12px;font-size:0.9rem;line-height:1.8;white-space:pre-wrap;word-break:break-word;">${escHtml(m.body||"")}</div>`;
+
+    document.getElementById("admin-note").value = m.adminNote || "";
+
+    const toggleBtn = document.getElementById("toggle-read-btn");
+    toggleBtn.innerHTML = m.status === "read"
+      ? `<i class="fa fa-envelope"></i> 未読に戻す`
+      : `<i class="fa fa-envelope-open"></i> 既読にする`;
+
+    document.getElementById("msg-detail-modal").classList.add("open");
+  };
+
+  document.getElementById("save-note-btn")?.addEventListener("click", async () => {
+    if (!currentMsgId) return;
+    const note = document.getElementById("admin-note").value.trim();
+    try {
+      await saveMessageNote(currentMsgId, note);
+      const m = allMessages.find(x => x.id === currentMsgId);
+      if (m) m.adminNote = note;
+      showToast("メモを保存しました", "success");
+    } catch { showToast("保存に失敗しました", "error"); }
+  });
+
+  document.getElementById("toggle-read-btn")?.addEventListener("click", async () => {
+    if (!currentMsgId) return;
+    const m = allMessages.find(x => x.id === currentMsgId);
+    if (!m) return;
+    const newStatus = m.status === "read" ? "unread" : "read";
+    try {
+      await markMessageRead(currentMsgId, newStatus);
+      m.status = newStatus;
+      renderMessages();
+      const unread = allMessages.filter(x => x.status === "unread").length;
+      const badge = document.getElementById("unread-badge");
+      badge.textContent = unread;
+      badge.style.display = unread > 0 ? "" : "none";
+      document.getElementById("msg-detail-modal").classList.remove("open");
+      showToast(newStatus === "read" ? "既読にしました" : "未読に戻しました", "success");
+    } catch { showToast("操作に失敗しました", "error"); }
+  });
+
+  document.getElementById("delete-msg-btn")?.addEventListener("click", async () => {
+    if (!currentMsgId) return;
+    if (!confirm("このメッセージを削除しますか？")) return;
+    try {
+      await deleteMessage(currentMsgId);
+      allMessages = allMessages.filter(x => x.id !== currentMsgId);
+      renderMessages();
+      document.getElementById("msg-detail-modal").classList.remove("open");
+      showToast("削除しました", "success");
+    } catch { showToast("削除に失敗しました", "error"); }
+  });
+
+  // モーダル背景クリックで閉じる
+  document.getElementById("msg-detail-modal")?.addEventListener("click", function(e) {
+    if (e.target === this) this.classList.remove("open");
+  });
 </script>
 </body>
 </html>

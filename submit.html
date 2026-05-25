@@ -917,7 +917,30 @@
     }
   });
 
-  // ========== ヘッダー ==========
+  // ========== ヘッダーイベント（一度だけ登録） ==========
+  document.getElementById("login-btn")?.addEventListener("click", async () => {
+    try { await loginWithGoogle(); }
+    catch { showToast("ログインに失敗しました", "error"); }
+  });
+  document.getElementById("logout-btn")?.addEventListener("click", async () => {
+    await logout(); location.href = "/";
+  });
+  document.getElementById("user-menu-btn")?.addEventListener("click", e => {
+    e.stopPropagation();
+    document.getElementById("dropdown-menu")?.classList.toggle("open");
+  });
+  document.addEventListener("click", () => {
+    document.getElementById("dropdown-menu")?.classList.remove("open");
+  });
+  document.getElementById("login-required-btn")?.addEventListener("click", async () => {
+    try { await loginWithGoogle(); }
+    catch { showToast("ログインに失敗しました", "error"); }
+  });
+  document.getElementById("hamburger-btn")?.addEventListener("click", () => {
+    document.getElementById("mobile-menu").classList.toggle("open");
+  });
+
+  // ========== ヘッダー（表示更新のみ） ==========
   function setupHeader(user) {
     const loginBtn = document.getElementById("login-btn");
     const menuBtn  = document.getElementById("user-menu-btn");
@@ -934,31 +957,7 @@
       loginBtn?.classList.remove("hidden");
       menuBtn?.classList.add("hidden");
     }
-    loginBtn?.addEventListener("click", async () => {
-      try { await loginWithGoogle(); }
-      catch { showToast("ログインに失敗しました", "error"); }
-    });
-    document.getElementById("logout-btn")?.addEventListener("click", async () => {
-      await logout(); location.href = "/";
-    });
-    document.getElementById("user-menu-btn")?.addEventListener("click", e => {
-      e.stopPropagation();
-      document.getElementById("dropdown-menu")?.classList.toggle("open");
-    });
-    document.addEventListener("click", () => {
-      document.getElementById("dropdown-menu")?.classList.remove("open");
-    });
   }
-
-  document.getElementById("login-required-btn")?.addEventListener("click", async () => {
-    try {
-      await loginWithGoogle();
-    } catch { showToast("ログインに失敗しました", "error"); }
-  });
-
-  document.getElementById("hamburger-btn")?.addEventListener("click", () => {
-    document.getElementById("mobile-menu").classList.toggle("open");
-  });
 </script>
 </body>
 </html>

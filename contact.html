@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お問い合わせ - 先生アプリ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .contact-layout {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 56px 20px 100px;
+    }
+
+    /* カテゴリ選択 */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .category-option input[type="radio"] { display: none; }
+    .category-option label {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      background: var(--bg);
+      transition: all var(--transition);
+      user-select: none;
+    }
+    .category-option input[type="radio"]:checked + label {
+      border-color: var(--moss);
+      background: #E8F0E4;
+      color: var(--moss-dark);
+      box-shadow: 0 0 0 3px rgba(74,103,65,0.12);
+    }
+    .category-option label:hover { border-color: var(--moss-light); }
+    .category-option .cat-icon { font-size: 1.3rem; }
+
+    /* 完了画面 */
+    .complete-view {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .complete-view__icon {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: 20px;
+    }
+    .complete-view h2 {
+      font-size: 1.4rem;
+      color: var(--moss-dark);
+      margin-bottom: 12px;
+    }
+    .complete-view p {
+      font-size: 0.95rem;
+      color: var(--text-sub);
+      line-height: 1.8;
+      margin-bottom: 32px;
+    }
+
+    /* ログイン促進バナー */
+    .login-banner {
+      background: #E8F0E4;
+      border: 1.5px solid var(--moss-light);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      font-size: 0.88rem;
+      color: var(--moss-dark);
+    }
+    .login-banner i { font-size: 1.4rem; flex-shrink: 0; }
+    .login-banner strong { display: block; margin-bottom: 2px; }
+
+    @media (max-width: 600px) {
+      .category-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+
+<!-- ヘッダー -->
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="site-logo">
+      <div class="site-logo__icon">🍀</div>
+      <div class="site-logo__text">先生<span>アプリ</span></div>
+    </a>
+    <nav class="site-nav">
+      <a href="/">ホーム</a>
+      <a href="apps.html">アプリ一覧</a>
+      <a href="about.html">このサイトについて</a>
+    </nav>
+    <div class="header-actions">
+      <button id="login-btn" class="btn btn--primary btn--sm">
+        <i class="fa fa-right-to-bracket"></i> ログイン
+      </button>
+      <div class="dropdown">
+        <button id="user-menu-btn" class="user-avatar hidden" data-dropdown-trigger aria-label="ユーザーメニュー">
+          <span id="user-avatar">👤</span>
+        </button>
+        <div class="dropdown-menu" id="dropdown-menu">
+          <span id="user-name-display" style="padding:10px 16px;font-size:0.82rem;color:var(--text-sub);display:block;border-bottom:1px solid var(--border);"></span>
+          <a href="mypage.html"><i class="fa fa-house"></i> マイページ</a>
+          <hr>
+          <button id="logout-btn"><i class="fa fa-right-from-bracket"></i> ログアウト</button>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger-btn" aria-label="メニュー" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/"><i class="fa fa-home"></i> ホーム</a>
+    <a href="apps.html"><i class="fa fa-grid-2"></i> アプリ一覧</a>
+    <a href="mypage.html"><i class="fa fa-user"></i> マイページ</a>
+    <a href="contact.html"><i class="fa fa-envelope"></i> お問い合わせ</a>
+  </div>
+</header>
+
+<!-- ページヒーロー -->
+<div class="page-hero">
+  <div class="container">
+    <p class="page-hero__label">CONTACT</p>
+    <h1>お問い合わせ</h1>
+    <p>ご質問・ご要望・不具合のご報告など、お気軽にお送りください。</p>
+  </div>
+</div>
+
+<main id="main-content">
+  <div class="contact-layout">
+
+    <!-- 送信完了画面（初期は非表示） -->
+    <div id="complete-view" class="complete-view hidden">
+      <span class="complete-view__icon">✅</span>
+      <h2>送信が完了しました</h2>
+      <p>お問い合わせありがとうございます。<br>内容を確認のうえ、対応いたします。</p>
+      <a href="/" class="btn btn--primary btn--lg">
+        <i class="fa fa-home"></i> トップページへ
+      </a>
+    </div>
+
+    <!-- フォーム本体 -->
+    <div id="contact-form-wrap">
+
+      <!-- ログイン促進バナー（未ログイン時のみ表示） -->
+      <div id="login-banner" class="login-banner hidden">
+        <i class="fa fa-circle-info"></i>
+        <div>
+          <strong>ログインすると名前・メールが自動入力されます</strong>
+          <span>未ログインでも送信できますが、返信が必要な場合はメールアドレスをご記入ください。</span>
+        </div>
+      </div>
+
+      <form id="contact-form" novalidate>
+
+        <!-- カテゴリ -->
+        <div class="form-group">
+          <fieldset>
+            <legend class="form-label">お問い合わせの種類 <span class="required">*必須</span></legend>
+            <div class="category-grid">
+              <div class="category-option">
+                <input type="radio" name="category" id="cat-question" value="質問" checked>
+                <label for="cat-question">
+                  <span class="cat-icon">❓</span> 使い方の質問
+                </label>
+              </div>
+              <div class="category-option">
+                <input type="radio" name="category" id="cat-request" value="要望">
+                <label for="cat-request">
+                  <span class="cat-icon">💡</span> 機能の要望
+                </label>
+              </div>
+              <div class="category-option">
+                <input type="radio" name="category" id="cat-bug" value="不具合">
+                <label for="cat-bug">
+                  <span class="cat-icon">🐛</span> 不具合の報告
+                </label>
+              </div>
+              <div class="category-option">
+                <input type="radio" name="category" id="cat-other" value="その他">
+                <label for="cat-other">
+                  <span class="cat-icon">💬</span> その他
+                </label>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <!-- お名前 -->
+        <div class="form-group">
+          <label class="form-label" for="contact-name">
+            お名前 <span class="required">*必須</span>
+          </label>
+          <input type="text" id="contact-name" class="form-input"
+                 placeholder="山田 太郎" maxlength="50" required>
+          <p class="form-error hidden" id="name-error">お名前を入力してください</p>
+        </div>
+
+        <!-- メールアドレス -->
+        <div class="form-group">
+          <label class="form-label" for="contact-email">
+            メールアドレス
+          </label>
+          <input type="email" id="contact-email" class="form-input"
+                 placeholder="example@school.ed.jp" maxlength="100">
+          <p class="form-hint">返信が必要な場合はご入力ください（任意）</p>
+        </div>
+
+        <!-- 内容 -->
+        <div class="form-group">
+          <label class="form-label" for="contact-body">
+            お問い合わせ内容 <span class="required">*必須</span>
+          </label>
+          <textarea id="contact-body" class="form-textarea"
+                    placeholder="お問い合わせ内容をできるだけ詳しくご記入ください。"
+                    rows="7" maxlength="2000" required></textarea>
+          <p class="form-hint"><span id="body-count">0</span>/2000文字</p>
+          <p class="form-error hidden" id="body-error">内容を入力してください</p>
+        </div>
+
+        <!-- 送信ボタン -->
+        <div style="text-align:right;">
+          <button type="submit" id="contact-submit-btn" class="btn btn--primary btn--lg">
+            <i class="fa fa-paper-plane"></i>
+            <span id="submit-label">送信する</span>
+          </button>
+        </div>
+
+      </form>
+    </div><!-- /#contact-form-wrap -->
+
+  </div>
+</main>
+
+<!-- フッター -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom" style="margin-top:0;border-top:none;">
+      <p>© 2026 先生アプリ. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container" aria-live="polite"></div>
+
+<script type="module">
+  import {
+    auth, loginWithGoogle, logout, onAuthStateChanged,
+    getUserDoc, sendMessage
+  } from "./js/firebase.js";
+
+  let currentUser = null;
+
+  function showToast(msg, type = "default") {
+    const c = document.getElementById("toast-container");
+    const icons = { success:"✅", error:"❌", warning:"⚠️", default:"📢" };
+    const t = document.createElement("div");
+    t.className = `toast toast--${type}`;
+    t.innerHTML = `<span>${icons[type]||icons.default}</span><span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+
+  // ========== ヘッダーイベント（一度だけ登録） ==========
+  document.getElementById("login-btn")?.addEventListener("click", async () => {
+    try { await loginWithGoogle(); }
+    catch { showToast("ログインに失敗しました", "error"); }
+  });
+  document.getElementById("logout-btn")?.addEventListener("click", async () => {
+    await logout(); location.href = "/";
+  });
+  document.getElementById("user-menu-btn")?.addEventListener("click", e => {
+    e.stopPropagation();
+    document.getElementById("dropdown-menu")?.classList.toggle("open");
+  });
+  document.addEventListener("click", () => {
+    document.getElementById("dropdown-menu")?.classList.remove("open");
+  });
+  document.getElementById("hamburger-btn")?.addEventListener("click", () => {
+    document.getElementById("mobile-menu").classList.toggle("open");
+  });
+
+  // ========== 認証 ==========
+  onAuthStateChanged(auth, async (user) => {
+    setupHeader(user);
+    currentUser = user;
+    if (user) {
+      // ログイン済み：名前・メール自動入力
+      const userDoc = await getUserDoc(user.uid);
+      const name  = userDoc?.displayName || user.displayName || "";
+      const email = user.email || "";
+      document.getElementById("contact-name").value  = name;
+      document.getElementById("contact-email").value = email;
+      document.getElementById("login-banner").classList.add("hidden");
+    } else {
+      document.getElementById("login-banner").classList.remove("hidden");
+    }
+  });
+
+  // ========== 文字数カウント ==========
+  document.getElementById("contact-body").addEventListener("input", () => {
+    document.getElementById("body-count").textContent =
+      document.getElementById("contact-body").value.length;
+  });
+
+  // ========== フォーム送信 ==========
+  document.getElementById("contact-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // バリデーション
+    let valid = true;
+    document.querySelectorAll(".form-error").forEach(el => el.classList.add("hidden"));
+
+    const name = document.getElementById("contact-name").value.trim();
+    if (!name) {
+      document.getElementById("name-error").classList.remove("hidden");
+      valid = false;
+    }
+    const body = document.getElementById("contact-body").value.trim();
+    if (!body) {
+      document.getElementById("body-error").classList.remove("hidden");
+      valid = false;
+    }
+    if (!valid) return;
+
+    const btn = document.getElementById("contact-submit-btn");
+    btn.disabled = true;
+    document.getElementById("submit-label").textContent = "送信中...";
+
+    const category = document.querySelector('input[name="category"]:checked')?.value || "その他";
+    const email    = document.getElementById("contact-email").value.trim();
+
+    try {
+      await sendMessage({
+        category,
+        name,
+        email:       email || null,
+        body,
+        uid:         currentUser?.uid || null,
+        displayName: currentUser?.displayName || name
+      });
+
+      // 完了画面に切り替え
+      document.getElementById("contact-form-wrap").classList.add("hidden");
+      document.getElementById("complete-view").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } catch (err) {
+      console.error(err);
+      showToast("送信に失敗しました。時間をおいて再度お試しください。", "error");
+      btn.disabled = false;
+      document.getElementById("submit-label").textContent = "送信する";
+    }
+  });
+
+  // ========== ヘッダー（表示更新のみ） ==========
+  function setupHeader(user) {
+    const loginBtn = document.getElementById("login-btn");
+    const menuBtn  = document.getElementById("user-menu-btn");
+    const avatar   = document.getElementById("user-avatar");
+    const nameEl   = document.getElementById("user-name-display");
+
+    if (user) {
+      loginBtn?.classList.add("hidden");
+      menuBtn?.classList.remove("hidden");
+      if (avatar) avatar.innerHTML = user.photoURL
+        ? `<img src="${user.photoURL}" alt="">` : (user.displayName||"先")[0];
+      if (nameEl) nameEl.textContent = user.displayName || "先生";
+    } else {
+      loginBtn?.classList.remove("hidden");
+      menuBtn?.classList.add("hidden");
+    }
+  }
+</script>
+</body>
+</html>
