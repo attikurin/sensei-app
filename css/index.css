@@ -348,6 +348,102 @@
 .howto-arrow { font-size: 1.5rem; color: var(--border-dark); align-self: center; padding: 0 4px; }
 
 /* =============================================
+   ログイン要否 案内セクション
+   ============================================= */
+.section--login-guide {
+  background: var(--bg);
+  border-top: 1.5px solid var(--border);
+  border-bottom: 1.5px solid var(--border);
+}
+
+.login-guide-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width: 640px) {
+  .login-guide-grid { grid-template-columns: 1fr; }
+}
+
+.login-guide-card {
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  border: 2px solid transparent;
+}
+.login-guide-card--free {
+  background: #f0faf0;
+  border-color: #b2ddb2;
+}
+.login-guide-card--required {
+  background: #fffbf0;
+  border-color: var(--mustard-light);
+}
+
+.login-guide-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.login-guide-card__icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.login-guide-card__header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--moss-dark);
+  margin: 0;
+}
+
+.login-guide-list {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.login-guide-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.93rem;
+  color: var(--text-main);
+  font-weight: 500;
+}
+.login-guide-list li span {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  width: 1.5em;
+  text-align: center;
+}
+
+.login-guide-card__note {
+  font-size: 0.83rem;
+  color: var(--text-sub);
+  line-height: 1.7;
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px dashed #ccc;
+}
+.login-guide-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  color: var(--moss);
+  font-weight: 600;
+  text-decoration: underline;
+  font-size: 0.85rem;
+  transition: color var(--transition);
+}
+.login-guide-card__link:hover {
+  color: var(--moss-dark);
+}
+
+/* =============================================
    安心バッジセクション
    ============================================= */
 .trust-grid {
