@@ -209,6 +209,31 @@ Firestoreの `users/{uid}` ドキュメントの `role` フィールドを `"adm
 
 ---
 
+## 🔍 SEO 対策（実装済み）
+
+| 対策 | 対象ページ | 内容 |
+|------|-----------|------|
+| `robots.txt` | 全体 | admin/submit/mypageをDisallow、sitemapを指定 |
+| `sitemap.xml` | 全体 | 公開ページ＋カテゴリ別URLを記載 |
+| `<meta name="description">` | 全ページ | 各ページ固有のdescription |
+| `<meta name="keywords">` | index / apps | 主要キーワードを設定 |
+| `<link rel="canonical">` | 公開ページ | 重複URLを防止 |
+| OGP (Open Graph) | 全公開ページ | SNSシェア時のタイトル・説明・画像 |
+| Twitter Card | 全公開ページ | summary_large_image形式 |
+| `noindex, nofollow` | admin / submit / mypage | ログイン必須ページをクロール除外 |
+| JSON-LD 構造化データ | index / apps / about / app-detail | WebSite・Organization・CollectionPage・SoftwareApplication・BreadcrumbList |
+| 動的 OGP 更新 | app-detail.html | アプリデータ取得後にJSでtitle / description / OGP / JSON-LDを動的設定 |
+| セマンティックHTML | 全ページ | `<header>`,`<nav>`,`<main>`,`<article>`,`<footer>` を使用 |
+| `<h1>` 1件のみ | 全ページ | 各ページにh1を1つのみ配置 |
+
+### デプロイ後に必要な作業
+
+1. `sitemap.xml` / `robots.txt` 内の `https://sensei-app.vercel.app/` を**実際のドメイン**に変更
+2. **Google Search Console** にサイトを登録し、`sitemap.xml` を送信
+3. **OGP 画像** (`og:image`) を用意してindex.html / apps.htmlのOGPに追加（推奨：1200×630px）
+
+---
+
 ## ❗ 未実装・今後の改善ポイント
 
 - [ ] **全文検索の強化**：現状は Firestore の制限でタグ絞り込みのみ。Algolia / Typesense 等の導入推奨

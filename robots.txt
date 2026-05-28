@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Allow: /apps.html
+Allow: /app-detail.html
+Allow: /about.html
+Allow: /contact.html
+Allow: /terms.html
+Allow: /privacy.html
+
+# ログイン必須・管理者専用ページはクロール不要
+Disallow: /admin.html
+Disallow: /submit.html
+Disallow: /mypage.html
+
+# URLパラメーター付きの重複コンテンツ防止
+Disallow: /apps.html?page=
+Disallow: /index.html
+
+Sitemap: https://sensei-app.vercel.app/sitemap.xml

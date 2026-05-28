@@ -3,8 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="アプリ詳細 - 先生アプリ">
+
+  <!-- ===== SEO 基本（JSで上書きされる） ===== -->
   <title>アプリ詳細 - 先生アプリ</title>
+  <meta name="description" content="先生アプリで公開されている教育向けAIアプリの詳細ページです。">
+  <meta name="robots" content="index, follow">
+
+  <!-- ===== OGP 初期値（JSで上書き） ===== -->
+  <meta property="og:type"      content="article">
+  <meta property="og:site_name" content="先生アプリ">
+  <meta property="og:locale"    content="ja_JP">
+
+  <!-- ===== Twitter Card 初期値（JSで上書き） ===== -->
+  <meta name="twitter:card" content="summary_large_image">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
@@ -471,6 +483,18 @@
     deleteApp, onAuthStateChanged, getUserDoc
   } from "./js/firebase.js";
 
+  // ===== SEO ヘルパー =====
+  function setMeta(name, content) {
+    let el = document.querySelector(`meta[name="${name}"]`);
+    if (!el) { el = document.createElement("meta"); el.name = name; document.head.appendChild(el); }
+    el.content = content;
+  }
+  function setOgp(property, content) {
+    let el = document.querySelector(`meta[property="${property}"]`);
+    if (!el) { el = document.createElement("meta"); el.setAttribute("property", property); document.head.appendChild(el); }
+    el.content = content;
+  }
+
   function escHtml(s) {
     return String(s ?? "").replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
@@ -528,12 +552,93 @@
   }
 
   function renderApp(app) {
-    // OGP タイトル更新
+    // ===== SEO: title / meta description =====
     document.title = `${app.title} - 先生アプリ`;
-    document.querySelector('meta[name="description"]').content = app.description || "";
+    const metaDesc = app.description
+      ? app.description.slice(0, 120) + (app.description.length > 120 ? "…" : "")
+      : `${app.title} ― 先生アプリで公開されている教育ツール`;
+    setMeta("description", metaDesc);
+
+    // ===== SEO: OGP =====
+    const pageUrl = `https://sensei-app.vercel.app/app-detail.html?id=${encodeURIComponent(app.id || "")}`;
+    setOgp("og:title",       `${app.title} - 先生アプリ`);
+    setOgp("og:description", metaDesc);
+    setOgp("og:type",        "article");
+    setOgp("og:url",         pageUrl);
+    setOgp("og:site_name",   "先生アプリ");
+    setOgp("og:locale",      "ja_JP");
+    if (app.thumbnailUrl) setOgp("og:image", app.thumbnailUrl);
+
+    // ===== SEO: Twitter Card =====
+    setMeta("twitter:card",        "summary_large_image");
+    setMeta("twitter:title",       `${app.title} - 先生アプリ`);
+    setMeta("twitter:description", metaDesc);
+    if (app.thumbnailUrl) setMeta("twitter:image", app.thumbnailUrl);
+
+    // ===== SEO: canonical =====
+    let canonicalEl = document.querySelector("link[rel='canonical']");
+    if (!canonicalEl) {
+      canonicalEl = document.createElement("link");
+      canonicalEl.rel = "canonical";
+      document.head.appendChild(canonicalEl);
+    }
+    canonicalEl.href = pageUrl;
+
+    // ===== SEO: JSON-LD 構造化データ =====
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": app.title,
+      "description": app.description || "",
+      "url": pageUrl,
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "ja",
+      "author": {
+        "@type": "Person",
+        "name": app.authorName || "先生"
+      },
+      "datePublished": app.createdAt?.toDate?.()?.toISOString() ?? undefined,
+      "dateModified":  app.updatedAt?.toDate?.()?.toISOString() ?? undefined,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "先生アプリ",
+        "url": "https://sensei-app.vercel.app/"
+      }
+    };
+    if (app.thumbnailUrl) jsonLd.image = app.thumbnailUrl;
+    if (app.tags?.length)  jsonLd.keywords = app.tags.join(", ");
+    let ldEl = document.getElementById("app-jsonld");
+    if (!ldEl) {
+      ldEl = document.createElement("script");
+      ldEl.id   = "app-jsonld";
+      ldEl.type = "application/ld+json";
+      document.head.appendChild(ldEl);
+    }
+    ldEl.textContent = JSON.stringify(jsonLd, null, 2);
 
     // パンくず
     document.getElementById("breadcrumb-title").textContent = app.title;
+
+    // ===== SEO: BreadcrumbList 構造化データ =====
+    const breadcrumbLd = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "ホーム",         "item": "https://sensei-app.vercel.app/" },
+        { "@type": "ListItem", "position": 2, "name": "アプリ一覧",     "item": "https://sensei-app.vercel.app/apps.html" },
+        { "@type": "ListItem", "position": 3, "name": app.title || "アプリ詳細", "item": pageUrl }
+      ]
+    };
+    let bcEl = document.getElementById("breadcrumb-jsonld");
+    if (!bcEl) {
+      bcEl = document.createElement("script");
+      bcEl.id   = "breadcrumb-jsonld";
+      bcEl.type = "application/ld+json";
+      document.head.appendChild(bcEl);
+    }
+    bcEl.textContent = JSON.stringify(breadcrumbLd);
 
     // サムネイル
     const thumb = document.getElementById("detail-thumb");
