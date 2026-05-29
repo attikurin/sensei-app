@@ -26,25 +26,25 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sensei-app.vercel.app/apps.html?tag=%E5%AD%A6%E7%B4%9A%E7%B5%8C%E5%96%B6</loc>
+    <loc>https://sensei-app-tau.vercel.app/apps.html?tag=%E5%AD%A6%E7%B4%9A%E7%B5%8C%E5%96%B6</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sensei-app.vercel.app/apps.html?tag=%E6%8E%88%E6%A5%AD%E3%83%BB%E6%95%99%E6%9D%90</loc>
+    <loc>https://sensei-app-tau.vercel.app/apps.html?tag=%E6%8E%88%E6%A5%AD%E3%83%BB%E6%95%99%E6%9D%90</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sensei-app.vercel.app/apps.html?tag=%E8%A9%95%E4%BE%A1%E3%83%BB%E6%8E%A1%E7%82%B9</loc>
+    <loc>https://sensei-app-tau.vercel.app/apps.html?tag=%E8%A9%95%E4%BE%A1%E3%83%BB%E6%8E%A1%E7%82%B9</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sensei-app.vercel.app/apps.html?tag=%E7%89%B9%E5%88%A5%E6%94%AF%E6%8F%B4</loc>
+    <loc>https://sensei-app-tau.vercel.app/apps.html?tag=%E7%89%B9%E5%88%A5%E6%94%AF%E6%8F%B4</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -52,7 +52,7 @@
 
   <!-- このサイトについて -->
   <url>
-    <loc>https://sensei-app.vercel.app/about.html</loc>
+    <loc>https://sensei-app-tau.vercel.app/about.html</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -60,7 +60,7 @@
 
   <!-- お問い合わせ -->
   <url>
-    <loc>https://sensei-app.vercel.app/contact.html</loc>
+    <loc>https://sensei-app-tau.vercel.app/contact.html</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
@@ -68,7 +68,7 @@
 
   <!-- 利用規約 -->
   <url>
-    <loc>https://sensei-app.vercel.app/terms.html</loc>
+    <loc>https://sensei-app-tau.vercel.app/terms.html</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
@@ -76,7 +76,7 @@
 
   <!-- プライバシーポリシー -->
   <url>
-    <loc>https://sensei-app.vercel.app/privacy.html</loc>
+    <loc>https://sensei-app-tau.vercel.app/privacy.html</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
