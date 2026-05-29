@@ -16,4 +16,4 @@ Disallow: /mypage.html
 Disallow: /apps.html?page=
 Disallow: /index.html
 
-Sitemap: https://sensei-app.vercel.app/sitemap.xml
+Sitemap: https://sensei-app-tau.vercel.app/sitemap.xml
