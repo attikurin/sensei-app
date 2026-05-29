@@ -560,7 +560,7 @@
     setMeta("description", metaDesc);
 
     // ===== SEO: OGP =====
-    const pageUrl = `https://sensei-app.vercel.app/app-detail.html?id=${encodeURIComponent(app.id || "")}`;
+    const pageUrl = `https://sensei-app-tau.vercel.app/app-detail.html?id=${encodeURIComponent(app.id || "")}`;
     setOgp("og:title",       `${app.title} - 先生アプリ`);
     setOgp("og:description", metaDesc);
     setOgp("og:type",        "article");
@@ -604,7 +604,7 @@
       "isPartOf": {
         "@type": "WebSite",
         "name": "先生アプリ",
-        "url": "https://sensei-app.vercel.app/"
+        "url": "https://sensei-app-tau.vercel.app/"
       }
     };
     if (app.thumbnailUrl) jsonLd.image = app.thumbnailUrl;
@@ -626,8 +626,8 @@
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "ホーム",         "item": "https://sensei-app.vercel.app/" },
-        { "@type": "ListItem", "position": 2, "name": "アプリ一覧",     "item": "https://sensei-app.vercel.app/apps.html" },
+        { "@type": "ListItem", "position": 1, "name": "ホーム",         "item": "https://sensei-app-tau.vercel.app/" },
+        { "@type": "ListItem", "position": 2, "name": "アプリ一覧",     "item": "https://sensei-app-tau.vercel.app/apps.html" },
         { "@type": "ListItem", "position": 3, "name": app.title || "アプリ詳細", "item": pageUrl }
       ]
     };
@@ -804,7 +804,7 @@
     } catch { showToast("削除に失敗しました", "error"); }
   });
 
-  // ========== ヘッダー認証UI ==========
+  // ========== ヘッダー認証UI（表示更新のみ） ==========
   function setupHeader(user) {
     const loginBtn  = document.getElementById("login-btn");
     const menuBtn   = document.getElementById("user-menu-btn");
@@ -824,23 +824,25 @@
       menuBtn?.classList.add("hidden");
       postBtn?.classList.add("hidden");
     }
-    loginBtn?.addEventListener("click", async () => {
-      const { loginWithGoogle } = await import("./js/firebase.js");
-      try { await loginWithGoogle(); }
-      catch { showToast("ログインに失敗しました", "error"); }
-    });
-    document.getElementById("logout-btn")?.addEventListener("click", async () => {
-      const { logout } = await import("./js/firebase.js");
-      await logout(); location.href = "/";
-    });
-    document.getElementById("user-menu-btn")?.addEventListener("click", e => {
-      e.stopPropagation();
-      document.getElementById("dropdown-menu")?.classList.toggle("open");
-    });
-    document.addEventListener("click", () => {
-      document.getElementById("dropdown-menu")?.classList.remove("open");
-    });
   }
+
+  // ========== ヘッダーイベント（一度だけ登録） ==========
+  document.getElementById("login-btn")?.addEventListener("click", async () => {
+    const { loginWithGoogle } = await import("./js/firebase.js");
+    try { await loginWithGoogle(); }
+    catch { showToast("ログインに失敗しました", "error"); }
+  });
+  document.getElementById("logout-btn")?.addEventListener("click", async () => {
+    const { logout } = await import("./js/firebase.js");
+    await logout(); location.href = "/";
+  });
+  document.getElementById("user-menu-btn")?.addEventListener("click", e => {
+    e.stopPropagation();
+    document.getElementById("dropdown-menu")?.classList.toggle("open");
+  });
+  document.addEventListener("click", () => {
+    document.getElementById("dropdown-menu")?.classList.remove("open");
+  });
 
   // ========== ハンバーガー ==========
   document.getElementById("hamburger-btn")?.addEventListener("click", () => {

@@ -151,14 +151,16 @@
 
     /* プロフィール編集ボタン */
     .profile-edit-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      margin-top: 12px; padding: 7px 16px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin-top: 12px; padding: 7px 12px;
       border-radius: var(--radius-md);
       border: 1.5px solid var(--border);
       background: var(--surface); color: var(--text-sub);
       font-size: 0.82rem; font-weight: 600;
       cursor: pointer; transition: all var(--transition);
-      width: 100%; justify-content: center;
+      width: 100%; box-sizing: border-box;
+      white-space: normal; word-break: break-word;
+      line-height: 1.4; text-align: center;
     }
     .profile-edit-btn:hover { border-color: var(--moss); color: var(--moss); background: #E8F0E4; }
 
@@ -275,7 +277,7 @@
           <p class="profile-email" id="profile-email">---</p>
 
           <button class="profile-edit-btn" id="open-profile-edit-btn" aria-label="プロフィールを編集">
-            <i class="fa fa-pen" aria-hidden="true"></i> ニックネーム・アイコンを編集
+            <i class="fa fa-pen" aria-hidden="true"></i> プロフィールを編集
           </button>
 
           <div class="profile-stats">
@@ -635,6 +637,7 @@
   });
 
   // ========== ヘッダー ==========
+  // ========== ヘッダー認証UI（表示更新のみ） ==========
   function setupHeader(user) {
     const loginBtn = document.getElementById("login-btn");
     const menuBtn  = document.getElementById("user-menu-btn");
@@ -654,21 +657,23 @@
       menuBtn?.classList.add("hidden");
       postBtn?.classList.add("hidden");
     }
-    loginBtn?.addEventListener("click", async () => {
-      try { await loginWithGoogle(); }
-      catch { showToast("ログインに失敗しました", "error"); }
-    });
-    document.getElementById("logout-btn")?.addEventListener("click", async () => {
-      await logout(); location.href = "/";
-    });
-    document.getElementById("user-menu-btn")?.addEventListener("click", e => {
-      e.stopPropagation();
-      document.getElementById("dropdown-menu")?.classList.toggle("open");
-    });
-    document.addEventListener("click", () => {
-      document.getElementById("dropdown-menu")?.classList.remove("open");
-    });
   }
+
+  // ========== ヘッダーイベント（一度だけ登録） ==========
+  document.getElementById("login-btn")?.addEventListener("click", async () => {
+    try { await loginWithGoogle(); }
+    catch { showToast("ログインに失敗しました", "error"); }
+  });
+  document.getElementById("logout-btn")?.addEventListener("click", async () => {
+    await logout(); location.href = "/";
+  });
+  document.getElementById("user-menu-btn")?.addEventListener("click", e => {
+    e.stopPropagation();
+    document.getElementById("dropdown-menu")?.classList.toggle("open");
+  });
+  document.addEventListener("click", () => {
+    document.getElementById("dropdown-menu")?.classList.remove("open");
+  });
 
   document.getElementById("login-required-btn")?.addEventListener("click", async () => {
     try { await loginWithGoogle(); }

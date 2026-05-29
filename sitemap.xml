@@ -4,7 +4,7 @@
 
   <!-- トップページ -->
   <url>
-    <loc>https://sensei-app.vercel.app/</loc>
+    <loc>https://sensei-app-tau.vercel.app/</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -12,7 +12,7 @@
 
   <!-- アプリ一覧 -->
   <url>
-    <loc>https://sensei-app.vercel.app/apps.html</loc>
+    <loc>https://sensei-app-tau.vercel.app/apps.html</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -20,7 +20,7 @@
 
   <!-- カテゴリ別一覧 -->
   <url>
-    <loc>https://sensei-app.vercel.app/apps.html?tag=%E6%A0%A1%E5%8B%99%E6%94%AF%E6%8F%B4</loc>
+    <loc>https://sensei-app-tau.vercel.app/apps.html?tag=%E6%A0%A1%E5%8B%99%E6%94%AF%E6%8F%B4</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

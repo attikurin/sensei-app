@@ -228,7 +228,7 @@ Firestoreの `users/{uid}` ドキュメントの `role` フィールドを `"adm
 
 ### デプロイ後に必要な作業
 
-1. `sitemap.xml` / `robots.txt` 内の `https://sensei-app.vercel.app/` を**実際のドメイン**に変更
+1. 公開URL: `https://sensei-app-tau.vercel.app/`（設定済み）
 2. **Google Search Console** にサイトを登録し、`sitemap.xml` を送信
 3. **OGP 画像** (`og:image`) を用意してindex.html / apps.htmlのOGPに追加（推奨：1200×630px）
 

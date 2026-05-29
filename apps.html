@@ -9,11 +9,11 @@
   <meta name="description" content="先生がAIで作った教育アプリを一覧で探せます。校務支援・学級経営・授業教材・評価採点・特別支援など目的別に絞り込み可能。HTMLダウンロード型でオフライン使用も対応。">
   <meta name="keywords" content="先生,教師,AIアプリ,校務支援,学級経営,授業教材,評価,特別支援,無料,教育ツール">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://sensei-app.vercel.app/apps.html">
+  <link rel="canonical" href="https://sensei-app-tau.vercel.app/apps.html">
 
   <!-- ===== OGP ===== -->
   <meta property="og:type"        content="website">
-  <meta property="og:url"         content="https://sensei-app.vercel.app/apps.html">
+  <meta property="og:url"         content="https://sensei-app-tau.vercel.app/apps.html">
   <meta property="og:title"       content="アプリ一覧 ― 先生アプリ | 教師向けAIアプリを探す">
   <meta property="og:description" content="先生がAIで作った教育アプリを一覧で探せます。校務支援・学級経営・授業教材・評価採点・特別支援など目的別に絞り込み可能。">
   <meta property="og:site_name"   content="先生アプリ">
@@ -31,12 +31,12 @@
     "@type": "CollectionPage",
     "name": "アプリ一覧 - 先生アプリ",
     "description": "先生がAIで作った教育アプリを探せるページ。校務支援・学級経営・授業教材・評価採点・特別支援など目的別に絞り込み可能。",
-    "url": "https://sensei-app.vercel.app/apps.html",
+    "url": "https://sensei-app-tau.vercel.app/apps.html",
     "inLanguage": "ja",
     "isPartOf": {
       "@type": "WebSite",
       "name": "先生アプリ",
-      "url": "https://sensei-app.vercel.app/"
+      "url": "https://sensei-app-tau.vercel.app/"
     }
   }
   </script>
@@ -370,18 +370,20 @@
       menuBtn?.classList.add("hidden");
       postBtn?.classList.add("hidden");
     }
-    loginBtn?.addEventListener("click", async () => {
-      try { await loginWithGoogle(); } catch { showToast("ログインに失敗しました","error"); }
-    });
-    document.getElementById("logout-btn")?.addEventListener("click", async () => {
-      await logout(); location.reload();
-    });
-    document.getElementById("user-menu-btn")?.addEventListener("click", e => {
-      e.stopPropagation();
-      document.getElementById("dropdown-menu")?.classList.toggle("open");
-    });
-    document.addEventListener("click", () => { document.getElementById("dropdown-menu")?.classList.remove("open"); });
   });
+
+  // ========== ヘッダーイベント（一度だけ登録） ==========
+  document.getElementById("login-btn")?.addEventListener("click", async () => {
+    try { await loginWithGoogle(); } catch { showToast("ログインに失敗しました","error"); }
+  });
+  document.getElementById("logout-btn")?.addEventListener("click", async () => {
+    await logout(); location.reload();
+  });
+  document.getElementById("user-menu-btn")?.addEventListener("click", e => {
+    e.stopPropagation();
+    document.getElementById("dropdown-menu")?.classList.toggle("open");
+  });
+  document.addEventListener("click", () => { document.getElementById("dropdown-menu")?.classList.remove("open"); });
 
   document.getElementById("hamburger-btn")?.addEventListener("click", () => {
     document.getElementById("mobile-menu")?.classList.toggle("open");
