@@ -122,7 +122,6 @@
     .file-drop__text { font-size: 0.88rem; color: var(--text-sub); }
     .file-drop__selected { font-size: 0.88rem; color: var(--moss); font-weight: 600; margin-top: 8px; }
     #html-file-input { display: none; }
-    #thumb-file-input { display: none; }
 
     /* サイドバーのヒント */
     .hint-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 22px; margin-bottom: 16px; }
@@ -571,7 +570,32 @@
 <!-- フッター -->
 <footer class="site-footer">
   <div class="container">
-    <div class="footer-bottom" style="margin-top:0;border-top:none;">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="site-logo">
+          <div class="site-logo__icon" style="background:rgba(255,255,255,0.2);">🍀</div>
+          <div class="site-logo__text">先生<span style="color:var(--salmon);">アプリ</span></div>
+        </a>
+        <p>先生たちがAIで自作したWebアプリを共有するプラットフォーム。</p>
+      </div>
+      <div class="footer-col">
+        <h4>サイトメニュー</h4>
+        <ul>
+          <li><a href="/">ホーム</a></li>
+          <li><a href="apps.html">アプリ一覧</a></li>
+          <li><a href="mypage.html">マイページ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>法的情報</h4>
+        <ul>
+          <li><a href="terms.html">利用規約</a></li>
+          <li><a href="privacy.html">プライバシーポリシー</a></li>
+          <li><a href="contact.html">お問い合わせ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
       <p>© 2026 先生アプリ. All rights reserved.</p>
     </div>
   </div>

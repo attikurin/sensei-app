@@ -450,17 +450,15 @@
           <li><a href="/">ホーム</a></li>
           <li><a href="apps.html">アプリ一覧</a></li>
           <li><a href="submit.html">アプリを投稿</a></li>
-          <li><a href="mypage.html">マイページ</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>カテゴリ</h4>
+        <h4>サイトメニュー</h4>
         <ul>
-          <li><a href="apps.html?tag=校務支援">校務支援</a></li>
-          <li><a href="apps.html?tag=学級経営">学級経営</a></li>
-          <li><a href="apps.html?tag=授業・教材">授業・教材</a></li>
-          <li><a href="apps.html?tag=評価・採点">評価・採点</a></li>
-          <li><a href="apps.html?tag=特別支援">特別支援</a></li>
+          <li><a href="apps.html">アプリ一覧</a></li>
+          <li><a href="submit.html">アプリを投稿</a></li>
+          <li><a href="mypage.html">マイページ</a></li>
+          <li><a href="about.html">このサイトについて</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -468,7 +466,6 @@
         <ul>
           <li><a href="terms.html">利用規約</a></li>
           <li><a href="privacy.html">プライバシーポリシー</a></li>
-          <li><a href="about.html">このサイトについて</a></li>
           <li><a href="contact.html">お問い合わせ</a></li>
         </ul>
       </div>
@@ -489,12 +486,6 @@
 <script type="module">
   import { loginWithGoogle, logout, getApps, getPickupApps, getNotices, onAuthStateChanged, auth }
     from "./js/firebase.js";
-
-  // UI ユーティリティ読み込み
-  const uiScript = document.createElement('script');
-  uiScript.src = './js/ui.js';
-  uiScript.type = 'module';
-  document.head.appendChild(uiScript);
 
   // ========== 状態 ==========
   let currentTag     = "";

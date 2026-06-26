@@ -218,6 +218,7 @@
   let currentPage    = 1;
   let lastDocStack   = [null];
   let currentOffline = false;
+  let currentSearch  = ""; // 検索キーワード
   const PAGE_SIZE    = 15;
 
   function createSkeletons(n) {
@@ -275,14 +276,25 @@
     empty.classList.add("hidden");
 
     try {
-      const { docs, lastDoc } = await getApps({
+      const { docs: rawDocs, lastDoc } = await getApps({
         tags:        currentOffline ? [] : (currentTag ? [currentTag] : []),
         sort:        currentSort,
-        pageSize:    PAGE_SIZE,
-        lastDoc:     lastDocStack[currentPage - 1],
+        pageSize:    currentSearch ? 100 : PAGE_SIZE, // 検索時は多めに取得してフィルター
+        lastDoc:     currentSearch ? null : lastDocStack[currentPage - 1],
         offlineOnly: currentOffline
       });
-      if (docs.length === PAGE_SIZE) lastDocStack[currentPage] = lastDoc;
+
+      // クライアント側キーワードフィルター
+      const docs = currentSearch
+        ? rawDocs.filter(a => {
+            const kw = currentSearch.toLowerCase();
+            return (a.title||"").toLowerCase().includes(kw)
+                || (a.description||"").toLowerCase().includes(kw)
+                || (a.tags||[]).some(t => t.includes(kw));
+          })
+        : rawDocs;
+
+      if (!currentSearch && docs.length === PAGE_SIZE) lastDocStack[currentPage] = lastDoc;
       if (!docs.length && currentPage === 1) {
         grid.innerHTML = ""; empty.classList.remove("hidden");
         count.textContent = "0件"; renderPagination(false, false); return;
@@ -290,7 +302,12 @@
       grid.innerHTML = docs.map(renderCard).join("");
       grid.setAttribute("aria-busy", "false");
       count.textContent = `${docs.length}件表示中`;
-      renderPagination(currentPage > 1, docs.length === PAGE_SIZE);
+      // 検索中はページネーション非表示
+      if (currentSearch) {
+        renderPagination(false, false);
+      } else {
+        renderPagination(currentPage > 1, docs.length === PAGE_SIZE);
+      }
     } catch (e) {
       console.error(e);
       grid.innerHTML = `<p class="text-sub" style="padding:24px;">読み込みに失敗しました。</p>`;
@@ -323,6 +340,9 @@
       btn.classList.add("active");
       currentOffline = btn.dataset.offline === "1";
       currentTag     = currentOffline ? "" : (btn.dataset.tag || "");
+      // タグ変更時は検索をリセット
+      currentSearch  = "";
+      document.getElementById("search-input").value = "";
       const label    = document.getElementById("apps-heading-label");
       if (currentOffline) {
         label.textContent = "📴 オフライン動作対応アプリ";
@@ -335,16 +355,31 @@
 
   // 並び替え
   document.getElementById("sort-select").addEventListener("change", e => {
-    currentSort = e.target.value; loadApps(true);
+    currentSort = e.target.value;
+    // 検索中でも並び替えを反映
+    loadApps(true);
   });
 
   // 検索
-  document.getElementById("search-btn").addEventListener("click", () => {
+  function doSearch() {
     const v = document.getElementById("search-input").value.trim();
-    if (v) { location.href = `apps.html?search=${encodeURIComponent(v)}`; }
-  });
+    currentSearch = v;
+    const label = document.getElementById("apps-heading-label");
+    if (v) {
+      label.textContent = `「${v}」の検索結果`;
+      // タグフィルターをリセット
+      document.querySelectorAll(".tag").forEach(b => b.classList.remove("active"));
+      document.querySelector(".tag[data-tag=''][data-offline='']")
+        ?.classList.add("active");
+      currentTag = ""; currentOffline = false;
+    } else {
+      label.textContent = "すべてのアプリ";
+    }
+    loadApps(true);
+  }
+  document.getElementById("search-btn").addEventListener("click", doSearch);
   document.getElementById("search-input").addEventListener("keydown", e => {
-    if (e.key === "Enter") document.getElementById("search-btn").click();
+    if (e.key === "Enter") doSearch();
   });
 
   // 認証ヘッダー
@@ -391,7 +426,7 @@
 
   // URLパラメータからタグ/検索
   const params = new URLSearchParams(location.search);
-  const urlTag = params.get("tag");
+  const urlTag    = params.get("tag");
   const urlSearch = params.get("search");
   if (urlTag) {
     currentTag = urlTag;
@@ -399,6 +434,7 @@
     document.getElementById("apps-heading-label").textContent = `「${urlTag}」のアプリ`;
   }
   if (urlSearch) {
+    currentSearch = urlSearch;
     document.getElementById("search-input").value = urlSearch;
     document.getElementById("apps-heading-label").textContent = `「${urlSearch}」の検索結果`;
   }
