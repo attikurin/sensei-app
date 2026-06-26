@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f1b35;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a2d5a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4a9eff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7b5fff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- 装飾円 -->
+  <circle cx="1050" cy="100" r="180" fill="#4a9eff" opacity="0.06"/>
+  <circle cx="150" cy="530" r="220" fill="#7b5fff" opacity="0.07"/>
+  <circle cx="600" cy="315" r="350" fill="#ffffff" opacity="0.02"/>
+
+  <!-- アクセントライン -->
+  <rect x="0" y="0" width="1200" height="5" fill="url(#accent)"/>
+
+  <!-- グリッド装飾（右側） -->
+  <!-- カード1: 校務支援 -->
+  <rect x="760" y="150" width="140" height="110" rx="16" fill="#1e3a6e" opacity="0.8"/>
+  <text x="830" y="200" font-family="sans-serif" font-size="32" fill="#4a9eff" text-anchor="middle">📋</text>
+  <text x="830" y="232" font-family="sans-serif" font-size="13" fill="#a0b8e0" text-anchor="middle">校務支援</text>
+
+  <!-- カード2: 学級経営 -->
+  <rect x="920" y="150" width="140" height="110" rx="16" fill="#1e3a6e" opacity="0.8"/>
+  <text x="990" y="200" font-family="sans-serif" font-size="32" fill="#ff8c42" text-anchor="middle">👨‍🏫</text>
+  <text x="990" y="232" font-family="sans-serif" font-size="13" fill="#a0b8e0" text-anchor="middle">学級経営</text>
+
+  <!-- カード3: 授業教材 -->
+  <rect x="760" y="280" width="140" height="110" rx="16" fill="#1e3a6e" opacity="0.8"/>
+  <text x="830" y="330" font-family="sans-serif" font-size="32" fill="#5ef0a0" text-anchor="middle">📚</text>
+  <text x="830" y="362" font-family="sans-serif" font-size="13" fill="#a0b8e0" text-anchor="middle">授業教材</text>
+
+  <!-- カード4: 特別支援 -->
+  <rect x="920" y="280" width="140" height="110" rx="16" fill="#1e3a6e" opacity="0.8"/>
+  <text x="990" y="330" font-family="sans-serif" font-size="32" fill="#ff6b9d" text-anchor="middle">❤️</text>
+  <text x="990" y="362" font-family="sans-serif" font-size="13" fill="#a0b8e0" text-anchor="middle">特別支援</text>
+
+  <!-- カード5: AI生成 -->
+  <rect x="760" y="410" width="140" height="110" rx="16" fill="#1e3a6e" opacity="0.8"/>
+  <text x="830" y="460" font-family="sans-serif" font-size="32" fill="#ffd700" text-anchor="middle">✨</text>
+  <text x="830" y="492" font-family="sans-serif" font-size="13" fill="#a0b8e0" text-anchor="middle">AI生成</text>
+
+  <!-- カード6: 無料DL -->
+  <rect x="920" y="410" width="140" height="110" rx="16" fill="#1e3a6e" opacity="0.8"/>
+  <text x="990" y="460" font-family="sans-serif" font-size="32" fill="#4a9eff" text-anchor="middle">⬇️</text>
+  <text x="990" y="492" font-family="sans-serif" font-size="13" fill="#a0b8e0" text-anchor="middle">無料DL</text>
+
+  <!-- メインタイトル -->
+  <text x="100" y="210" font-family="'Hiragino Kaku Gothic Pro','Yu Gothic','Noto Sans JP',sans-serif"
+        font-size="88" font-weight="900" fill="#ffffff" filter="url(#glow)" letter-spacing="4">先生アプリ</text>
+
+  <!-- アクセントバー -->
+  <rect x="100" y="240" width="380" height="5" rx="3" fill="url(#accent)"/>
+
+  <!-- サブタイトル -->
+  <text x="100" y="305" font-family="'Hiragino Kaku Gothic Pro','Yu Gothic','Noto Sans JP',sans-serif"
+        font-size="26" fill="#a0c4f0" letter-spacing="1">AIで作った先生のためのアプリ共有サイト</text>
+
+  <!-- 説明文 -->
+  <text x="100" y="360" font-family="'Hiragino Kaku Gothic Pro','Yu Gothic','Noto Sans JP',sans-serif"
+        font-size="19" fill="#6a8cb0">校務支援・学級経営・授業教材など、先生が自作したWebアプリを</text>
+  <text x="100" y="390" font-family="'Hiragino Kaku Gothic Pro','Yu Gothic','Noto Sans JP',sans-serif"
+        font-size="19" fill="#6a8cb0">無料で共有・ダウンロードできるプラットフォームです。</text>
+
+  <!-- タグバッジ -->
+  <rect x="100" y="430" width="130" height="36" rx="18" fill="#4a9eff" opacity="0.2"/>
+  <rect x="100" y="430" width="130" height="36" rx="18" fill="none" stroke="#4a9eff" stroke-width="1.5"/>
+  <text x="165" y="454" font-family="sans-serif" font-size="15" fill="#4a9eff" text-anchor="middle"># ChatGPT</text>
+
+  <rect x="245" y="430" width="115" height="36" rx="18" fill="#7b5fff" opacity="0.2"/>
+  <rect x="245" y="430" width="115" height="36" rx="18" fill="none" stroke="#7b5fff" stroke-width="1.5"/>
+  <text x="303" y="454" font-family="sans-serif" font-size="15" fill="#7b5fff" text-anchor="middle"># Gemini</text>
+
+  <rect x="373" y="430" width="110" height="36" rx="18" fill="#5ef0a0" opacity="0.2"/>
+  <rect x="373" y="430" width="110" height="36" rx="18" fill="none" stroke="#5ef0a0" stroke-width="1.5"/>
+  <text x="428" y="454" font-family="sans-serif" font-size="15" fill="#5ef0a0" text-anchor="middle"># Claude</text>
+
+  <!-- サイトURL -->
+  <text x="100" y="560" font-family="sans-serif" font-size="18" fill="#3a5a8a">sensei-app-tau.vercel.app</text>
+
+  <!-- ロゴっぽいアイコン -->
+  <circle cx="50" cy="552" r="16" fill="url(#accent)"/>
+  <text x="50" y="558" font-family="sans-serif" font-size="16" fill="#ffffff" text-anchor="middle">🍎</text>
+
+  <!-- 下部ライン -->
+  <rect x="0" y="625" width="1200" height="5" fill="url(#accent)" opacity="0.5"/>
+</svg>
